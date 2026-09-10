@@ -1,3 +1,6 @@
+require('pg');
+require('pg-hstore');
+
 const app = require('../src/index');
 const { connectDatabase } = require('../src/config/database');
 
