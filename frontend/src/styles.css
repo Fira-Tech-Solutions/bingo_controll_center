@@ -1,0 +1,299 @@
+:root {
+  --bg-dark: #1b1b2f;
+  --bg-panel: #222344;
+  --bg-panel-light: #2d2e50;
+  --primary: #1976d2;
+  --secondary: #ffcc00;
+  --accent: #38bdf8;
+  --success: #4caf50;
+  --danger: #e53935;
+  --text-light: #fff;
+  --text-muted: #94a3b8;
+  --surface: #0f172a;
+  --surface-card: #1e293b;
+  --surface-hover: #334155;
+  --border: #334155;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-light);
+  background: var(--surface);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { background: var(--surface); color: var(--text-light); }
+button, input, select, textarea { font: inherit; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* ── Global card style ─────────────────────────────────── */
+.bg-white, .bg-slate-50 {
+  background-color: var(--surface-card) !important;
+  color: var(--text-light) !important;
+}
+
+/* ── Topographic hero background ───────────────────────── */
+.hero-topo-bg {
+  background-color: var(--primary);
+  background-image:
+    radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+    radial-gradient(circle at 90% 40%, rgba(25, 118, 210, 0.9) 0%, transparent 70%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Topographic contour lines ─────────────────────────── */
+.topo-lines {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.2' stroke-opacity='0.15'%3E%3Cpath d='M-50,80 C60,20 120,160 220,100 C320,40 370,120 450,90'/%3E%3Cpath d='M-40,110 C80,50 140,190 230,130 C320,70 380,150 460,120'/%3E%3Cpath d='M-30,140 C100,80 150,220 250,160 C350,100 390,180 470,150'/%3E%3Cpath d='M-20,180 C110,120 170,250 260,190 C350,130 400,210 480,180'/%3E%3Cellipse cx='260' cy='120' rx='50' ry='32'/%3E%3Cellipse cx='260' cy='120' rx='80' ry='52'/%3E%3Cellipse cx='260' cy='120' rx='115' ry='75'/%3E%3Cellipse cx='110' cy='60' rx='60' ry='38'/%3E%3Cellipse cx='110' cy='60' rx='95' ry='60'/%3E%3Cpath d='M-50,230 C90,190 190,300 290,240 C380,180 420,270 480,230'/%3E%3Cellipse cx='340' cy='280' rx='65' ry='42'/%3E%3Cellipse cx='340' cy='280' rx='95' ry='65'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 320px 320px;
+}
+
+/* ── Wave separator ────────────────────────────────────── */
+.wave-separator {
+  filter: drop-shadow(0 -8px 16px rgba(0, 0, 0, 0.3));
+}
+
+/* ── Underlined form inputs ────────────────────────────── */
+.clean-underline-input {
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1.5px solid var(--border) !important;
+  border-radius: 0 !important;
+  padding-left: 2rem !important;
+  padding-bottom: 0.6rem !important;
+  background: transparent !important;
+  color: var(--text-light) !important;
+  transition: all 0.25s ease;
+}
+.clean-underline-input:focus {
+  border-bottom-color: var(--primary) !important;
+  box-shadow: 0 0 8px rgba(25, 118, 210, 0.3) !important;
+}
+
+/* ── Role pill selector ────────────────────────────────── */
+.role-pill.active {
+  background-color: rgba(25, 118, 210, 0.2);
+  color: var(--accent);
+  border-color: rgba(56, 189, 248, 0.3);
+  font-weight: 600;
+}
+
+/* ── Safe area for mobile bottom nav ───────────────────── */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── Animate in utility ────────────────────────────────── */
+.animate-in {
+  animation-duration: 200ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+.slide-in-from-left {
+  animation-name: slideInFromLeft;
+}
+.slide-in-from-bottom {
+  animation-name: slideInFromBottom;
+}
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+@keyframes slideInFromBottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ── Shadow system ─────────────────────────────────────── */
+.shadow-soft {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.shadow-md {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.shadow-lg {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.shadow-xl {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+.shadow-coral-500\/20 {
+  --tw-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+}
+.shadow-coral-500\/25 {
+  --tw-shadow: 0 4px 15px rgba(25, 118, 210, 0.25);
+}
+
+/* ── Step wizard animations ────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.8) translateY(12px); }
+  60% { transform: scale(1.03) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes checkmark {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rotateGlow {
+  0%   { box-shadow: 0 0 15px rgba(77, 166, 255, 0.7); }
+  25%  { box-shadow: 0 0 20px rgba(77, 166, 255, 0.9); }
+  50%  { box-shadow: 0 0 25px rgba(77, 166, 255, 1); }
+  75%  { box-shadow: 0 0 20px rgba(77, 166, 255, 0.9); }
+  100% { box-shadow: 0 0 15px rgba(77, 166, 255, 0.7); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.4s ease-out both;
+}
+.animate-scale-in {
+  animation: scaleIn 0.35s ease-out both;
+}
+.animate-pop-in {
+  animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out both;
+}
+
+/* ── Staggered children ────────────────────────────────── */
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+
+/* ── Package card glow on select ───────────────────────── */
+.pkg-card-selected {
+  box-shadow: 0 0 0 2px var(--primary), 0 8px 24px rgba(25, 118, 210, 0.25);
+}
+
+/* ── Progress bar shimmer ──────────────────────────────── */
+.progress-shimmer {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 50%, var(--primary) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Success checkmark ─────────────────────────────────── */
+.success-check circle {
+  stroke: var(--success);
+  stroke-width: 2;
+  fill: none;
+}
+.success-check polyline {
+  stroke: var(--success);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmark 0.4s ease-out 0.2s forwards;
+}
+
+/* ── Tailwind color overrides for dark theme ───────────── */
+.bg-white { background-color: var(--surface-card) !important; }
+.bg-slate-50 { background-color: var(--surface-card) !important; }
+.bg-slate-100 { background-color: var(--surface-hover) !important; }
+.bg-coral-50 { background-color: rgba(25, 118, 210, 0.1) !important; }
+.bg-coral-100 { background-color: rgba(25, 118, 210, 0.15) !important; }
+.bg-coral-500 { background-color: var(--primary) !important; }
+.bg-emerald-50 { background-color: rgba(76, 175, 80, 0.1) !important; }
+.bg-emerald-100 { background-color: rgba(76, 175, 80, 0.15) !important; }
+.bg-red-50 { background-color: rgba(229, 57, 53, 0.1) !important; }
+.bg-amber-100 { background-color: rgba(255, 204, 0, 0.15) !important; }
+
+/* ── Text color overrides for dark theme ───────────────── */
+.text-slate-900 { color: #f1f5f9 !important; }
+.text-slate-800 { color: #e2e8f0 !important; }
+.text-slate-700 { color: #cbd5e1 !important; }
+.text-slate-600 { color: #94a3b8 !important; }
+.text-slate-500 { color: #94a3b8 !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-coral-500 { color: var(--primary) !important; }
+.text-coral-600 { color: var(--accent) !important; }
+.text-emerald-600 { color: var(--success) !important; }
+.text-emerald-700 { color: var(--success) !important; }
+.text-red-500 { color: var(--danger) !important; }
+.text-red-600 { color: var(--danger) !important; }
+.text-red-800 { color: var(--danger) !important; }
+.text-amber-600 { color: var(--secondary) !important; }
+.text-amber-700 { color: var(--secondary) !important; }
+
+.border-coral-100 { border-color: var(--border) !important; }
+.border-coral-200 { border-color: var(--border) !important; }
+.border-emerald-200 { border-color: rgba(76, 175, 80, 0.3) !important; }
+.border-red-200 { border-color: rgba(229, 57, 53, 0.3) !important; }
+
+.hover\:bg-coral-50:hover { background-color: rgba(25, 118, 210, 0.15) !important; }
+.hover\:bg-coral-100:hover { background-color: rgba(25, 118, 210, 0.2) !important; }
+.hover\:bg-coral-500:hover { background-color: #1565c0 !important; }
+.hover\:bg-coral-600:hover { background-color: #1256a3 !important; }
+.hover\:bg-emerald-100:hover { background-color: rgba(76, 175, 80, 0.2) !important; }
+.hover\:bg-red-50:hover { background-color: rgba(229, 57, 53, 0.15) !important; }
+
+.focus\:border-coral-400:focus { border-color: var(--primary) !important; }
+.focus\:border-coral-500:focus { border-color: var(--primary) !important; }
+
+.ring-coral-500 { --tw-ring-color: var(--primary); }
+
+/* ── Input dark theme ──────────────────────────────────── */
+input, select, textarea {
+  background-color: var(--surface-card) !important;
+  color: var(--text-light) !important;
+  border-color: var(--border) !important;
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2) !important;
+  outline: none;
+}
+
+/* ── Table dark theme ──────────────────────────────────── */
+table { color: var(--text-light); }
+thead tr { border-bottom-color: var(--border) !important; }
+tbody tr { border-bottom-color: rgba(51, 65, 85, 0.5) !important; }
+tbody tr:hover { background-color: rgba(25, 118, 210, 0.05) !important; }
+th { color: var(--text-muted) !important; }
+
+/* ── Badge / Pill dark theme ───────────────────────────── */
+.rounded-full {
+  border-color: var(--border);
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bingo Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            colors: {
+              coral: {
+                50: '#fff1f2',
+                100: '#ffe4e6',
+                200: '#fecdd3',
+                300: '#fda4af',
+                400: '#ff8585',
+                500: '#ff6b6b',
+                600: '#fa5252',
+                700: '#e11d48',
+              },
+              brand: {
+                navy: '#1e40af',
+                emerald: '#059669',
+                dark: '#0f172a',
+                muted: '#64748b',
+              },
+              surface: {
+                DEFAULT: '#f2e9e7',
+                container: {
+                  DEFAULT: '#fff1f2',
+                  low: '#fef2f2',
+                  high: '#ffe4e6',
+                  lowest: '#ffffff',
+                },
+              },
+              on: {
+                surface: { DEFAULT: '#0f172a', variant: '#64748b' },
+              },
+            },
+            boxShadow: {
+              soft: '0 1px 8px rgba(0,0,0,0.04)',
+            },
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-[#f2e9e7] text-slate-800">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
