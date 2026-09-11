@@ -102,20 +102,6 @@ export default function SuperAdminSidebar({ mobileOpen, onClose }) {
       <aside className="hidden lg:flex w-72 bg-[#1b1b2f] shadow-soft border-r border-[#334155] flex-col shrink-0">
         {sidebarContent}
       </aside>
-
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-          <aside className="absolute left-0 top-0 bottom-0 w-72 bg-[#1b1b2f] shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
-            <div className="flex justify-end p-2">
-              <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#334155] text-slate-400">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            {sidebarContent}
-          </aside>
-        </div>
-      )}
     </>
   )
 }

@@ -85,7 +85,6 @@ function PageLoader() {
 // ─── Single Shell (role-based rendering) ──────────────────────
 function AppShell() {
   const { user, logout } = useAuth()
-  const [mobileOpen, setMobileOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
@@ -110,11 +109,10 @@ function AppShell() {
   return (
     <div className="min-h-screen bg-[#0f172a] text-white">
       <div className="flex min-h-screen">
-        <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+        <Sidebar />
         <div className="flex-1 min-w-0 pb-20 lg:pb-0">
           <header className="sticky top-0 z-20 bg-[#1e293b]/90 backdrop-blur border-b border-[#334155] px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
-              <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-[#334155] text-slate-300"><span className="material-symbols-outlined">menu</span></button>
               <div className="min-w-0">
                 <div className="font-extrabold text-xl text-white tracking-tight truncate">{TITLES[pathname] || 'Dashboard'}</div>
               </div>
