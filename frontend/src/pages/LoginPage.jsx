@@ -14,14 +14,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex font-sans">
+    <div className="min-h-screen bg-[#0b0f19] flex font-sans">
       {/* Left: Hero */}
-      <div className="relative hidden md:flex md:w-[45%] flex-col justify-end p-10" style={{ background: 'linear-gradient(135deg, #000072 0%, #1b1b2f 100%)' }}>
+      <div className="relative hidden md:flex md:w-[45%] flex-col justify-end p-10" style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #0b0f19 60%, #1a1040 100%)' }}>
         <div className="absolute inset-0 topo-lines opacity-50 pointer-events-none"></div>
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(25, 118, 210, 0.3) 0%, transparent 60%)' }}></div>
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 70%, rgba(37, 99, 235, 0.3) 0%, transparent 60%)' }}></div>
         <div className="relative z-10">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="bg-[#1976d2] p-3 rounded-2xl shadow-lg shadow-[#1976d2]/30">
+            <div className="bg-[#2563eb] p-3 rounded-2xl shadow-lg shadow-blue-500/30">
               <span className="text-2xl font-extrabold text-white">BC</span>
             </div>
             <div>
@@ -31,7 +31,7 @@ export default function LoginPage() {
           </div>
         </div>
         <div className="absolute -bottom-1 left-0 right-0 z-20 wave-separator leading-none">
-          <svg className="w-full block text-[#0f172a] fill-current" fill="none" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-full block text-[#0b0f19] fill-current" fill="none" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,40 C80,20 160,60 280,35 C340,22 370,38 400,42 L400,60 L0,60 Z"></path>
           </svg>
         </div>
@@ -42,7 +42,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center space-x-3 mb-8 md:hidden">
-            <div className="bg-[#1976d2] p-2 rounded-xl shadow-lg shadow-[#1976d2]/30">
+            <div className="bg-[#2563eb] p-2 rounded-xl shadow-lg shadow-blue-500/30">
               <span className="text-xl font-extrabold text-white">BC</span>
             </div>
             <div>
@@ -52,7 +52,7 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-3xl font-extrabold text-white tracking-tight">Sign in</h1>
-          <span className="block w-14 h-1.5 bg-[#1976d2] rounded-full mt-2"></span>
+          <span className="block w-14 h-1.5 bg-[#3b82f6] rounded-full mt-2"></span>
 
           {error && (
             <div className="mt-4 px-4 py-3 rounded-xl bg-[rgba(229,57,53,0.1)] border border-[rgba(229,57,53,0.3)] text-sm font-medium text-[#e53935] flex items-center gap-2">
@@ -107,8 +107,8 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#1976d2] hover:bg-[#1565c0] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#1976d2]/25 transition duration-150 flex items-center justify-center space-x-2 disabled:opacity-60"
-              style={{ boxShadow: '0 0 10px rgba(25, 118, 210, 0.5)' }}
+              className="w-full py-3.5 bg-[#2563eb] hover:bg-[#1d4ed8] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/25 transition duration-150 flex items-center justify-center space-x-2 disabled:opacity-60"
+              style={{ boxShadow: '0 0 10px rgba(37, 99, 235, 0.5)' }}
             >
               {loading ? (
                 <i className="fa-solid fa-spinner fa-spin text-xs"></i>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -20,43 +21,45 @@
             },
             colors: {
               coral: {
-                50: '#fff1f2',
-                100: '#ffe4e6',
-                200: '#fecdd3',
-                300: '#fda4af',
-                400: '#ff8585',
-                500: '#ff6b6b',
-                600: '#fa5252',
-                700: '#e11d48',
+                50: '#eff6ff',
+                100: '#dbeafe',
+                200: '#bfdbfe',
+                300: '#93c5fd',
+                400: '#60a5fa',
+                500: '#3b82f6',
+                600: '#2563eb',
+                700: '#1d4ed8',
               },
               brand: {
                 navy: '#1e40af',
                 emerald: '#059669',
-                dark: '#0f172a',
+                dark: '#0b0f19',
                 muted: '#64748b',
               },
               surface: {
-                DEFAULT: '#f2e9e7',
+                DEFAULT: '#0b0f19',
                 container: {
-                  DEFAULT: '#fff1f2',
-                  low: '#fef2f2',
-                  high: '#ffe4e6',
-                  lowest: '#ffffff',
+                  DEFAULT: '#131b2e',
+                  low: '#0e1526',
+                  high: '#162032',
+                  lowest: '#0b0f19',
                 },
               },
               on: {
-                surface: { DEFAULT: '#0f172a', variant: '#64748b' },
+                surface: { DEFAULT: '#f1f5f9', variant: '#94a3b8' },
               },
             },
             boxShadow: {
-              soft: '0 1px 8px rgba(0,0,0,0.04)',
+              soft: '0 4px 15px rgba(0, 0, 0, 0.3)',
+              card: '0 4px 20px rgba(0, 0, 0, 0.25)',
+              glow: '0 0 20px rgba(59, 130, 246, 0.3)',
             },
           }
         }
       }
     </script>
   </head>
-  <body class="bg-[#f2e9e7] text-slate-800">
+  <body class="bg-[#0b0f19] text-slate-100 font-sans antialiased selection:bg-blue-500/30 selection:text-blue-200">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

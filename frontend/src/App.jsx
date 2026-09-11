@@ -71,13 +71,13 @@ const TITLES = {
 function PageLoader() {
   return (
     <div className="space-y-4 animate-pulse">
-      <div className="h-8 w-48 bg-[#1e293b] rounded-lg"></div>
+      <div className="h-8 w-48 bg-[#131b2e] rounded-lg"></div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-28 bg-[#1e293b] rounded-2xl"></div>
+          <div key={i} className="h-28 bg-[#131b2e] rounded-2xl"></div>
         ))}
       </div>
-      <div className="h-64 bg-[#1e293b] rounded-2xl"></div>
+      <div className="h-64 bg-[#131b2e] rounded-2xl"></div>
     </div>
   )
 }
@@ -107,37 +107,37 @@ function AppShell() {
   const userInitial = user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[#0b0f19] text-white">
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="flex-1 min-w-0 pb-20 lg:pb-0">
-          <header className="sticky top-0 z-20 bg-[#1e293b]/90 backdrop-blur border-b border-[#334155] px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <header className="sticky top-0 z-20 bg-[#0e1526]/80 backdrop-blur-md border-b border-white/[0.07] px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="min-w-0">
                 <div className="font-extrabold text-xl text-white tracking-tight truncate">{TITLES[pathname] || 'Dashboard'}</div>
               </div>
             </div>
             <div className="relative" ref={profileRef}>
-              <button onClick={() => setProfileOpen(!profileOpen)} className="w-10 h-10 rounded-full bg-[#1976d2] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#1976d2]/30 hover:bg-[#1565c0] transition-colors">
+              <button onClick={() => setProfileOpen(!profileOpen)} className="w-10 h-10 rounded-full bg-[#2563eb] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#2563eb]/30 hover:bg-[#1d4ed8] transition-colors">
                 {userInitial}
               </button>
               {profileOpen && (
-                <div className="absolute right-0 top-12 w-64 bg-[#1e293b] rounded-2xl shadow-xl border border-[#334155] py-2 animate-fade-up z-50">
-                  <div className="px-4 py-3 border-b border-[#334155]">
+                <div className="absolute right-0 top-12 w-64 bg-[#131b2e] rounded-2xl shadow-xl border border-white/[0.08] py-2 animate-fade-up z-50">
+                  <div className="px-4 py-3 border-b border-white/[0.08]">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-[#1976d2] text-white flex items-center justify-center font-bold text-lg">{userInitial}</div>
+                      <div className="w-12 h-12 rounded-full bg-[#2563eb] text-white flex items-center justify-center font-bold text-lg">{userInitial}</div>
                       <div className="min-w-0">
                         <div className="font-bold text-sm text-white truncate">{user?.full_name}</div>
-                        <div className="text-xs text-slate-400 truncate">@{user?.username}</div>
+                        <div className="text-xs text-[#94a3b8] truncate">@{user?.username}</div>
                       </div>
                     </div>
                   </div>
                   <div className="px-4 py-3 space-y-2">
-                    <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-slate-400">mail</span><span className="text-slate-300 truncate">{user?.email || '—'}</span></div>
-                    <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-slate-400">badge</span><span className="text-slate-300">{isSuperAdmin ? 'Super Admin' : 'Admin'}</span></div>
+                    <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-[#94a3b8]">mail</span><span className="text-[#e2e8f0] truncate">{user?.email || '—'}</span></div>
+                    <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-[#94a3b8]">badge</span><span className="text-[#e2e8f0]">{isSuperAdmin ? 'Super Admin' : 'Admin'}</span></div>
                   </div>
-                  <div className="border-t border-[#334155] pt-2 px-2">
-                    <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-[#e53935] hover:bg-[rgba(229,57,53,0.1)] text-sm font-semibold transition-colors">
+                  <div className="border-t border-white/[0.08] pt-2 px-2">
+                    <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-[#ef4444] hover:bg-[#ef4444]/10 text-sm font-semibold transition-colors">
                       <span className="material-symbols-outlined text-[18px]">logout</span>Sign Out
                     </button>
                   </div>

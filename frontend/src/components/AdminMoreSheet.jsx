@@ -17,9 +17,9 @@ export default function AdminMoreSheet({ open, onClose }) {
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute bottom-0 left-0 right-0 bg-[#1b1b2f] rounded-t-3xl max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-200">
+      <div className="absolute bottom-0 left-0 right-0 bg-[#131b2e] rounded-t-3xl max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-200">
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full bg-[#334155]"></div>
+          <div className="w-10 h-1 rounded-full bg-white/[0.08]"></div>
         </div>
         <div className="px-5 pb-2">
           <h3 className="font-extrabold text-lg text-white">More</h3>
@@ -33,7 +33,7 @@ export default function AdminMoreSheet({ open, onClose }) {
                 onClick={onClose}
                 className={({ isActive }) =>
                   `flex flex-col items-center gap-2 p-4 rounded-2xl transition-colors ${
-                    isActive ? 'bg-[#1976d2]/20 text-[#38bdf8]' : 'bg-[#1e293b] text-slate-400 hover:bg-[#334155]'
+                    isActive ? 'bg-[#3b82f6]/20 text-[#3b82f6]' : 'bg-[#131b2e] text-slate-400 hover:bg-white/[0.05]'
                   }`
                 }
               >

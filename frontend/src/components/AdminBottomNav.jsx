@@ -10,7 +10,7 @@ const BOTTOM_ITEMS = [
 
 export default function AdminBottomNav({ onMoreClick }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#1b1b2f] border-t border-[#334155] lg:hidden safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#0e1526] border-t border-white/[0.07] lg:hidden safe-area-bottom">
       <div className="flex items-center justify-around h-16">
         {BOTTOM_ITEMS.map((item) =>
           item.label === 'More' ? (
@@ -29,7 +29,7 @@ export default function AdminBottomNav({ onMoreClick }) {
               end={item.end}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center gap-0.5 w-16 ${
-                  isActive ? 'text-[#38bdf8]' : 'text-slate-400'
+                  isActive ? 'text-[#3b82f6]' : 'text-slate-400'
                 }`
               }
             >
@@ -37,7 +37,7 @@ export default function AdminBottomNav({ onMoreClick }) {
                 <>
                   <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
                   <span className="text-[10px] font-semibold">{item.label}</span>
-                  {isActive && <span className="w-1 h-1 rounded-full bg-[#1976d2] mt-0.5"></span>}
+                  {isActive && <span className="w-1 h-1 rounded-full bg-[#3b82f6] mt-0.5"></span>}
                 </>
               )}
             </NavLink>
