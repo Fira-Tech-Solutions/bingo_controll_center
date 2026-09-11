@@ -131,15 +131,9 @@ export default function AdminCenters() {
     <div className="space-y-6">
       {error && <Banner tone="error" text={error} />}
 
-      <section className="bg-white rounded-2xl p-6 shadow-soft border border-coral-100/50 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <div>
-          <h2 className="font-extrabold text-2xl text-slate-900 tracking-tight">Bingo Centers</h2>
-          <p className="text-sm text-slate-500 mt-1">{filtered.length} center(s) • Your assigned centers</p>
-        </div>
-        <button onClick={openWizard}
-          className="px-5 py-3 rounded-2xl bg-coral-500 text-white font-bold text-sm shadow-lg shadow-coral-500/25 hover:bg-coral-600 active:scale-[0.97] transition-all duration-150 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[20px]">add_circle</span>Create Center
-        </button>
+      <section className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1"><span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search centers..." className="w-full h-11 pl-10 pr-4 rounded-xl bg-white border border-coral-100 text-sm font-medium focus:outline-none focus:border-coral-500" /></div>
+        <div className="flex flex-wrap gap-2">{STATUS_FILTERS.map((s) => (<button key={s} onClick={() => setStatusFilter(s)} className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${statusFilter === s ? 'bg-coral-500 text-white' : 'bg-white text-slate-600 border border-coral-100 hover:bg-coral-50'}`}>{s}</button>))}</div>
       </section>
 
       {/* ─── WIZARD OVERLAY ────────────────────────────────── */}
@@ -297,18 +291,6 @@ export default function AdminCenters() {
       )}
 
       {/* ─── CENTER LIST ──────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search centers..." className="w-full h-11 pl-10 pr-4 rounded-xl bg-white border border-coral-100 text-sm font-medium focus:outline-none focus:border-coral-500" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {STATUS_FILTERS.map((s) => (
-            <button key={s} onClick={() => setStatusFilter(s)} className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${statusFilter === s ? 'bg-coral-500 text-white' : 'bg-white text-slate-600 border border-coral-100 hover:bg-coral-50'}`}>{s}</button>
-          ))}
-        </div>
-      </div>
-
       <div className="hidden lg:block bg-white rounded-2xl shadow-soft border border-coral-100/50 overflow-hidden">
         <table className="w-full">
           <thead><tr className="border-b border-coral-100">
@@ -346,6 +328,10 @@ export default function AdminCenters() {
           <button onClick={() => navigate(`/centers/${c.username}`)} className="w-full mt-3 py-2 rounded-xl bg-coral-50 text-coral-600 text-sm font-semibold border border-coral-100 hover:bg-coral-100 transition-colors">View Details</button>
         </div>
       ))}{filtered.length === 0 && <EmptyState text="No centers match your filters." />}</div>
+
+      <button onClick={openWizard} className="fixed bottom-24 right-6 lg:bottom-8 lg:right-8 z-40 w-14 h-14 rounded-full bg-[#1976d2] text-white shadow-lg shadow-[#1976d2]/30 hover:bg-[#1565c0] active:scale-95 transition-all duration-150 flex items-center justify-center">
+        <span className="material-symbols-outlined text-[28px]">add</span>
+      </button>
     </div>
   )
 }
