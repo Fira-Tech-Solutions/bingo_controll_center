@@ -248,33 +248,33 @@ export default function SuperAdminDashboard() {
 
       {/* KPI Grid */}
       <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KpiCard title="Bingo Centers" value={activeCenters} icon="storefront" onClick={() => navigate('/super-admin/centers')} />
-        <KpiCard title="Administrators" value={operators.length} icon="admin_panel_settings" onClick={() => navigate('/super-admin/users/admins')} />
-        <KpiCard title="Agents" value={activeOperators} icon="badge" onClick={() => navigate('/super-admin/users/agents')} />
-        <KpiCard title="Packages Active" value={activePackages} icon="inventory_2" onClick={() => navigate('/super-admin/packages')} />
-        <KpiCard title="Transactions" value={filteredTransactions.length} icon="receipt_long" onClick={() => navigate('/super-admin/transactions')} />
-        <KpiCard title="Today's Payments" value={formatAmount(totalPayments)} icon="payments" onClick={() => navigate('/super-admin/reports')} />
+        <KpiCard title="Bingo Centers" value={activeCenters} icon="storefront" onClick={() => navigate('/centers')} />
+        <KpiCard title="Administrators" value={operators.length} icon="admin_panel_settings" onClick={() => navigate('/users/admins')} />
+        <KpiCard title="Agents" value={activeOperators} icon="badge" onClick={() => navigate('/users/agents')} />
+        <KpiCard title="Packages Active" value={activePackages} icon="inventory_2" onClick={() => navigate('/packages')} />
+        <KpiCard title="Transactions" value={filteredTransactions.length} icon="receipt_long" onClick={() => navigate('/transactions')} />
+        <KpiCard title="Today's Payments" value={formatAmount(totalPayments)} icon="payments" onClick={() => navigate('/reports')} />
       </section>
 
       {/* Financial Overview */}
       <section className="grid xl:grid-cols-12 gap-6">
         <SectionCard title="Financial Overview" subtitle={`${period.toUpperCase()} period`} className="xl:col-span-8" action={
-          <button onClick={() => navigate('/super-admin/reports')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View Reports →</button>
+          <button onClick={() => navigate('/reports')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View Reports →</button>
         }>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button onClick={() => navigate('/super-admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Total Payments</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{formatAmount(totalPayments)}</div>
             </button>
-            <button onClick={() => navigate('/super-admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Balance Issued</div>
               <div className="mt-1 text-xl font-extrabold text-coral-600">{formatAmount(totalBalanceIssued)}</div>
             </button>
-            <button onClick={() => navigate('/super-admin/transactions')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/transactions')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Transactions</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{filteredTransactions.length}</div>
             </button>
-            <button onClick={() => navigate('/super-admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Avg Payment</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{formatAmount(avgPayment)}</div>
             </button>
@@ -306,7 +306,7 @@ export default function SuperAdminDashboard() {
           {centerRanking.length > 0 ? (
             <div>
               {centerRanking.map((c, i) => (
-                <CenterRankRow key={c.name} rank={i + 1} name={c.name} activity={`${c.count} txns`} balance={c.balance} onClick={() => navigate('/super-admin/centers')} />
+                <CenterRankRow key={c.name} rank={i + 1} name={c.name} activity={`${c.count} txns`} balance={c.balance} onClick={() => navigate('/centers')} />
               ))}
             </div>
           ) : (
@@ -315,11 +315,11 @@ export default function SuperAdminDashboard() {
         </SectionCard>
 
         <SectionCard title="Recent Transactions" subtitle="Latest ledger events" className="xl:col-span-7" action={
-          <button onClick={() => navigate('/super-admin/transactions')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View All →</button>
+          <button onClick={() => navigate('/transactions')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View All →</button>
         }>
           <div className="space-y-1">
             {recentTransactions.map((tx) => (
-              <button key={tx.id} onClick={() => navigate('/super-admin/transactions')} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
+              <button key={tx.id} onClick={() => navigate('/transactions')} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
                 <div className="min-w-0">
                   <div className="font-semibold text-sm text-slate-900 truncate">{tx.bingoCenterUsername}</div>
                   <div className="text-xs text-slate-400">{formatDate(tx.timestamp)} • by {tx.debitedBy}</div>

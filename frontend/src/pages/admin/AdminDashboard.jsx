@@ -140,33 +140,33 @@ export default function AdminDashboard() {
 
       {/* KPI Grid */}
       <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KpiCard title="Assigned Centers" value={String(centers.length)} icon="storefront" onClick={() => navigate('/admin/centers')} />
-        <KpiCard title="Agents" value={String(activeOps)} icon="badge" onClick={() => navigate('/admin/agents')} />
-        <KpiCard title="Transactions" value={String(filtered.length)} icon="receipt_long" onClick={() => navigate('/admin/transactions')} />
-        <KpiCard title="Payments" value={formatAmount(totalPaid)} icon="payments" onClick={() => navigate('/admin/reports')} />
-        <KpiCard title="Balance Issued" value={formatAmount(totalIssued)} icon="generating_tokens" onClick={() => navigate('/admin/reports')} />
-        <KpiCard title="Packages" value={String(packages.filter((p) => p.isActive).length)} icon="inventory_2" onClick={() => navigate('/admin/packages')} />
+        <KpiCard title="Assigned Centers" value={String(centers.length)} icon="storefront" onClick={() => navigate('/centers')} />
+        <KpiCard title="Agents" value={String(activeOps)} icon="badge" onClick={() => navigate('/agents')} />
+        <KpiCard title="Transactions" value={String(filtered.length)} icon="receipt_long" onClick={() => navigate('/transactions')} />
+        <KpiCard title="Payments" value={formatAmount(totalPaid)} icon="payments" onClick={() => navigate('/reports')} />
+        <KpiCard title="Balance Issued" value={formatAmount(totalIssued)} icon="generating_tokens" onClick={() => navigate('/reports')} />
+        <KpiCard title="Packages" value={String(packages.filter((p) => p.isActive).length)} icon="inventory_2" onClick={() => navigate('/packages')} />
       </section>
 
       {/* Financial + Alerts */}
       <section className="grid xl:grid-cols-12 gap-6">
         <SectionCard title="Financial Overview" subtitle={`${period.toUpperCase()} period`} className="xl:col-span-8" action={
-          <button onClick={() => navigate('/admin/reports')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View Reports →</button>
+          <button onClick={() => navigate('/reports')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View Reports →</button>
         }>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button onClick={() => navigate('/admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Total Payments</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{formatAmount(totalPaid)}</div>
             </button>
-            <button onClick={() => navigate('/admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Balance Issued</div>
               <div className="mt-1 text-xl font-extrabold text-coral-600">{formatAmount(totalIssued)}</div>
             </button>
-            <button onClick={() => navigate('/admin/transactions')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/transactions')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Transactions</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{filtered.length}</div>
             </button>
-            <button onClick={() => navigate('/admin/agents')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
+            <button onClick={() => navigate('/agents')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Active Agents</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{activeOps}</div>
             </button>
@@ -191,11 +191,11 @@ export default function AdminDashboard() {
       {/* Recent Transactions + Centers */}
       <section className="grid xl:grid-cols-12 gap-6">
         <SectionCard title="Recent Transactions" subtitle="Latest ledger events" className="xl:col-span-7" action={
-          <button onClick={() => navigate('/admin/transactions')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View All →</button>
+          <button onClick={() => navigate('/transactions')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View All →</button>
         }>
           <div className="space-y-1">
             {filtered.slice(0, 6).map((tx) => (
-              <button key={tx.id} onClick={() => navigate('/admin/transactions')} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
+              <button key={tx.id} onClick={() => navigate('/transactions')} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
                 <div className="min-w-0">
                   <div className="font-semibold text-sm text-slate-900 truncate">{tx.bingoCenterUsername}</div>
                   <div className="text-xs text-slate-400">{formatDate(tx.timestamp)} • by {tx.debitedBy}</div>
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
         </SectionCard>
 
         <SectionCard title="Your Centers" subtitle="Assigned centers" className="xl:col-span-5" action={
-          <button onClick={() => navigate('/admin/centers')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View All →</button>
+          <button onClick={() => navigate('/centers')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View All →</button>
         }>
           <div className="space-y-2">
             {centers.slice(0, 5).map((c) => {

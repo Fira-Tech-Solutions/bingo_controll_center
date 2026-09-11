@@ -56,7 +56,7 @@ export default function SuperAdminCenterDetail() {
     return (
       <div className="space-y-6">
         <Banner tone="error" text="Center not found." />
-        <button onClick={() => navigate('/super-admin/centers')} className="px-4 py-2 rounded-xl bg-coral-50 text-coral-600 text-sm font-semibold border border-coral-100">← Back to Centers</button>
+        <button onClick={() => navigate('/centers')} className="px-4 py-2 rounded-xl bg-coral-50 text-coral-600 text-sm font-semibold border border-coral-100">← Back to Centers</button>
       </div>
     )
   }

@@ -46,7 +46,7 @@ export default function AdminCenterDetail() {
     return (
       <div className="space-y-6">
         <Banner tone="error" text="Center not found." />
-        <button onClick={() => navigate('/admin/centers')} className="px-4 py-2 rounded-xl bg-coral-50 text-coral-600 text-sm font-semibold border border-coral-100">← Back to Centers</button>
+        <button onClick={() => navigate('/centers')} className="px-4 py-2 rounded-xl bg-coral-50 text-coral-600 text-sm font-semibold border border-coral-100">← Back to Centers</button>
       </div>
     )
   }
@@ -61,7 +61,7 @@ export default function AdminCenterDetail() {
       {notice && <Banner tone="success" text={notice} />}
 
       <section className="bg-white rounded-2xl p-6 shadow-soft border border-coral-100/50">
-        <button onClick={() => navigate('/admin/centers')} className="text-xs font-semibold text-coral-600 hover:text-coral-700 mb-3 flex items-center gap-1">
+        <button onClick={() => navigate('/centers')} className="text-xs font-semibold text-coral-600 hover:text-coral-700 mb-3 flex items-center gap-1">
           <span className="material-symbols-outlined text-[16px]">arrow_back</span>Back to Centers
         </button>
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
