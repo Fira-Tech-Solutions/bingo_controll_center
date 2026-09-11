@@ -8,3 +8,6 @@ archives/
 
 # test files
 test_outputs/
+
+# vercel build output
+.vercel/
