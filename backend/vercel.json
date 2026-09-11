@@ -3,6 +3,6 @@
   "installCommand": "npm install",
   "buildCommand": "node build.js",
   "rewrites": [
-    { "source": "/(.*)", "dest": "api/index.js" }
+    { "source": "/(.*)", "destination": "api/index.js" }
   ]
 }
