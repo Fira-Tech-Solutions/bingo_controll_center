@@ -79,7 +79,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div>
+            <div className="py-2">
               <label className="text-xs font-semibold text-slate-400 mb-1.5 block">Password</label>
               <div className="relative">
                 <span className="absolute left-1 text-slate-500 text-sm flex items-center space-x-1.5 pointer-events-none">
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className="clean-underline-input w-full text-sm font-medium text-white bg-transparent focus:outline-none pr-8 placeholder:text-slate-500"
+                  className="clean-underline-input w-full text-sm font-medium text-white bg-transparent focus:outline-none pr-10 py-2 placeholder:text-slate-500"
                   placeholder="Enter your password"
                   value={form.password}
                   onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))}
@@ -97,9 +97,9 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 text-slate-500 hover:text-slate-300 focus:outline-none text-xs"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 focus:outline-none transition-colors"
                 >
-                  <i className={`fa-regular ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
               </div>
             </div>

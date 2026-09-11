@@ -93,18 +93,6 @@ export default function AdminBalanceFiles() {
     <div className="space-y-6">
       {error && <Banner tone="error" text={error} />}
 
-      {/* Header */}
-      <section className="bg-white rounded-2xl p-6 shadow-soft border border-coral-100/50 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <div>
-          <h2 className="font-extrabold text-2xl text-slate-900 tracking-tight">Balance Files</h2>
-          <p className="text-sm text-slate-500 mt-1">{filtered.length} file(s) generated</p>
-        </div>
-        <button onClick={openWizard} className="px-5 py-3 rounded-2xl bg-coral-500 text-white font-bold text-sm shadow-lg shadow-coral-500/25 hover:bg-coral-600 active:scale-[0.97] transition-all duration-150 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[20px]">add_circle</span>
-          Generate Balance File
-        </button>
-      </section>
-
       {/* ─── WIZARD OVERLAY ────────────────────────────────── */}
       {wizardOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
@@ -382,7 +370,11 @@ export default function AdminBalanceFiles() {
           </div>
           <div className="text-xs text-slate-500 mt-2">by {tx.debitedBy}</div>
         </div>
-      ))}{filtered.length === 0 && <EmptyState text="No balance files found." />}</div>
+      )      )}{filtered.length === 0 && <EmptyState text="No balance files found." />}</div>
+
+      <button onClick={openWizard} className="fixed bottom-24 right-6 lg:bottom-8 lg:right-8 z-40 w-14 h-14 rounded-full bg-[#1976d2] text-white shadow-lg shadow-[#1976d2]/30 hover:bg-[#1565c0] active:scale-95 transition-all duration-150 flex items-center justify-center">
+        <span className="material-symbols-outlined text-[28px]">add</span>
+      </button>
     </div>
   )
 }

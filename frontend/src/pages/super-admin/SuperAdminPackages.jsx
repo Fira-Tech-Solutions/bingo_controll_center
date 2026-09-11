@@ -16,6 +16,7 @@ export default function SuperAdminPackages() {
   const [form, setForm] = useState({ name: '', payment_amount: '', balance_amount: '', description: '', is_bonus: false })
   const [formStep, setFormStep] = useState('form')
   const [usageMap, setUsageMap] = useState({})
+  const [search, setSearch] = useState('')
 
   useEffect(() => { loadData() }, [])
 
@@ -94,14 +95,8 @@ export default function SuperAdminPackages() {
       {error && <Banner tone="error" text={error} />}
       {notice && <Banner tone="success" text={notice} />}
 
-      <section className="bg-white rounded-2xl p-6 shadow-soft border border-coral-100/50 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <div>
-          <h2 className="font-extrabold text-2xl text-slate-900 tracking-tight">Packages</h2>
-          <p className="text-sm text-slate-500 mt-1">{packages.length} package(s) • Full CRUD available</p>
-        </div>
-        <button onClick={() => { setShowCreate(!showCreate); setEditingId(null); setForm({ name: '', payment_amount: '', balance_amount: '', description: '' }); setFormStep('form'); }} className="px-4 py-2.5 rounded-xl bg-coral-500 text-white font-bold text-sm shadow-md shadow-coral-500/20 hover:bg-coral-600 transition-colors">
-          <i className="fa-solid fa-plus mr-1.5"></i>Create Package
-        </button>
+      <section className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1"><span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search packages..." className="w-full h-11 pl-10 pr-4 rounded-xl bg-white border border-coral-100 text-sm font-medium focus:outline-none focus:border-coral-500" /></div>
       </section>
 
       {/* Create/Edit Form */}
@@ -235,6 +230,9 @@ export default function SuperAdminPackages() {
         ))}
         {packages.length === 0 && <EmptyState text="No packages created yet." />}
       </div>
+      <button onClick={() => { setShowCreate(true); setEditingId(null); setForm({ name: '', payment_amount: '', balance_amount: '', description: '' }); setFormStep('form'); }} className="fixed bottom-24 right-6 lg:bottom-8 lg:right-8 z-40 w-14 h-14 rounded-full bg-[#1976d2] text-white shadow-lg shadow-[#1976d2]/30 hover:bg-[#1565c0] active:scale-95 transition-all duration-150 flex items-center justify-center">
+        <span className="material-symbols-outlined text-[28px]">add</span>
+      </button>
     </div>
   )
 }
