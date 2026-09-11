@@ -8,8 +8,9 @@ const config = require('../config/config');
 const USER_KEY_SOURCE = config.userKeySource;
 const TOPUP_KEY_SOURCE = config.topupKeySource;
 
-const ARCHIVE_DIR = path.join(__dirname, '..', '..', 'archives');
-if (!fs.existsSync(ARCHIVE_DIR)) fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
+const IS_SERVERLESS = !!process.env.VERCEL;
+const ARCHIVE_DIR = IS_SERVERLESS ? '/tmp/archives' : path.join(__dirname, '..', '..', 'archives');
+try { fs.mkdirSync(ARCHIVE_DIR, { recursive: true }); } catch {}
 
 function truncate32(source) {
   return source.slice(0, 32);
