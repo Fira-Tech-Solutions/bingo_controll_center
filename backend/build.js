@@ -10,6 +10,7 @@ async function build() {
     outfile: path.join(__dirname, 'api', 'index.js'),
     minify: false,
     sourcemap: false,
+    external: ['pg-native'],
   });
   console.log('Build complete: api/index.js (bundled)');
 }

@@ -54,7 +54,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Health check ──────────────────────────────────────────────
+// ── Root & Health check ───────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Bingo Control Center API',
+    status: 'online',
+    health: '/health',
+    version: '1.0.0',
+  });
+});
+
 app.get('/health', async (req, res) => {
   const { checkConnection } = require('./config/database');
   const dbOk = await checkConnection();

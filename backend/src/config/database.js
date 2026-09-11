@@ -1,12 +1,15 @@
 const { Sequelize } = require('sequelize');
+const pg = require('pg');
 const config = require('./config');
 const logger = require('../utils/logger');
 
 const useSSL = config.env === 'production' || (config.db.host && config.db.host.includes('render.com'));
+const isServerless = !!process.env.VERCEL;
 
 const sequelize = config.db.url
   ? new Sequelize(config.db.url, {
       dialect: config.db.dialect,
+      dialectModule: pg,
       dialectOptions: useSSL ? {
         ssl: { require: true, rejectUnauthorized: false },
       } : {},
@@ -21,6 +24,7 @@ const sequelize = config.db.url
       host: config.db.host,
       port: config.db.port,
       dialect: config.db.dialect,
+      dialectModule: pg,
       dialectOptions: useSSL ? {
         ssl: { require: true, rejectUnauthorized: false },
       } : {},
@@ -41,7 +45,7 @@ async function checkConnection() {
   }
 }
 
-async function connectDatabase(retries = 5, delay = 3000) {
+async function connectDatabase(retries = isServerless ? 2 : 5, delay = isServerless ? 1000 : 3000) {
   for (let i = 0; i < retries; i++) {
     try {
       await sequelize.authenticate();
@@ -73,7 +77,7 @@ async function disconnectDatabase() {
     await sequelize.close();
     logger.info('PostgreSQL connection closed');
   } catch (error) {
-    logger.error('Error closing MySQL connection:', error);
+    logger.error('Error closing PostgreSQL connection:', error);
   }
 }
 
