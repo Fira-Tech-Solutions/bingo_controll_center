@@ -109,14 +109,14 @@ function ActivityRow({ item }) {
   )
 }
 
-function CenterRankRow({ rank, name, activity, balance }) {
+function CenterRankRow({ rank, name, activity, balance, onClick }) {
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-coral-100/50 last:border-0">
+    <button onClick={onClick} className="w-full flex items-center gap-3 py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
       <span className="w-6 h-6 rounded-full bg-coral-50 text-coral-600 flex items-center justify-center text-xs font-bold">{rank}</span>
       <span className="font-semibold text-sm text-slate-900 flex-1 min-w-0 truncate">{name}</span>
       <span className="text-xs text-slate-500 shrink-0">{activity}</span>
       <span className="text-sm font-bold text-slate-900 shrink-0">{formatAmount(balance)}</span>
-    </div>
+    </button>
   )
 }
 
@@ -224,25 +224,9 @@ export default function SuperAdminDashboard() {
       {error && <Banner tone="error" text={error} />}
 
       {/* Header */}
-      <section className="bg-white rounded-2xl p-6 shadow-soft border border-coral-100/50 flex flex-col xl:flex-row gap-5 justify-between">
-        <div>
-          <h2 className="font-extrabold text-2xl text-slate-900 tracking-tight">{greeting}, {user?.full_name?.split(' ')[0] || 'Admin'}</h2>
-          <p className="text-slate-500 mt-1 text-sm">System overview for {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => navigate('/super-admin/users/admins')} className="px-4 py-2.5 rounded-xl bg-coral-500 text-white font-bold text-sm shadow-md shadow-coral-500/20 hover:bg-coral-600 transition-colors">
-            <i className="fa-solid fa-user-plus mr-1.5"></i>Create Admin
-          </button>
-          <button onClick={() => navigate('/super-admin/users/agents')} className="px-4 py-2.5 rounded-xl bg-coral-50 text-coral-600 font-semibold text-sm border border-coral-100 hover:bg-coral-100 transition-colors">
-            <i className="fa-solid fa-user-plus mr-1.5"></i>Create Agent
-          </button>
-          <button onClick={() => navigate('/super-admin/centers')} className="px-4 py-2.5 rounded-xl bg-coral-50 text-coral-600 font-semibold text-sm border border-coral-100 hover:bg-coral-100 transition-colors">
-            <i className="fa-solid fa-storefront mr-1.5"></i>New Center
-          </button>
-          <button onClick={() => navigate('/super-admin/packages')} className="px-4 py-2.5 rounded-xl bg-coral-50 text-coral-600 font-semibold text-sm border border-coral-100 hover:bg-coral-100 transition-colors">
-            <i className="fa-solid fa-box mr-1.5"></i>New Package
-          </button>
-        </div>
+      <section className="bg-white rounded-2xl p-6 shadow-soft border border-coral-100/50">
+        <h2 className="font-extrabold text-2xl text-slate-900 tracking-tight">{greeting}, {user?.full_name?.split(' ')[0] || 'Admin'}</h2>
+        <p className="text-slate-500 mt-1 text-sm">System overview for {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       </section>
 
       {/* Period Filter */}
@@ -278,22 +262,22 @@ export default function SuperAdminDashboard() {
           <button onClick={() => navigate('/super-admin/reports')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View Reports →</button>
         }>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            <button onClick={() => navigate('/super-admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Total Payments</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{formatAmount(totalPayments)}</div>
-            </div>
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            </button>
+            <button onClick={() => navigate('/super-admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Balance Issued</div>
               <div className="mt-1 text-xl font-extrabold text-coral-600">{formatAmount(totalBalanceIssued)}</div>
-            </div>
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            </button>
+            <button onClick={() => navigate('/super-admin/transactions')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Transactions</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{filteredTransactions.length}</div>
-            </div>
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            </button>
+            <button onClick={() => navigate('/super-admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Avg Payment</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{formatAmount(avgPayment)}</div>
-            </div>
+            </button>
           </div>
         </SectionCard>
 
@@ -322,7 +306,7 @@ export default function SuperAdminDashboard() {
           {centerRanking.length > 0 ? (
             <div>
               {centerRanking.map((c, i) => (
-                <CenterRankRow key={c.name} rank={i + 1} name={c.name} activity={`${c.count} txns`} balance={c.balance} />
+                <CenterRankRow key={c.name} rank={i + 1} name={c.name} activity={`${c.count} txns`} balance={c.balance} onClick={() => navigate('/super-admin/centers')} />
               ))}
             </div>
           ) : (
@@ -335,7 +319,7 @@ export default function SuperAdminDashboard() {
         }>
           <div className="space-y-1">
             {recentTransactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0">
+              <button key={tx.id} onClick={() => navigate('/super-admin/transactions')} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
                 <div className="min-w-0">
                   <div className="font-semibold text-sm text-slate-900 truncate">{tx.bingoCenterUsername}</div>
                   <div className="text-xs text-slate-400">{formatDate(tx.timestamp)} • by {tx.debitedBy}</div>
@@ -344,7 +328,7 @@ export default function SuperAdminDashboard() {
                   <div className="text-sm font-bold text-slate-900">{formatAmount(tx.actualAmount)}</div>
                   <div className="text-xs text-coral-600">→ {formatAmount(tx.generatedAmount)}</div>
                 </div>
-              </div>
+              </button>
             ))}
             {recentTransactions.length === 0 && <EmptyState text="No transactions in this period." />}
           </div>

@@ -154,22 +154,22 @@ export default function AdminDashboard() {
           <button onClick={() => navigate('/admin/reports')} className="text-xs font-semibold text-coral-600 hover:text-coral-700">View Reports →</button>
         }>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            <button onClick={() => navigate('/admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Total Payments</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{formatAmount(totalPaid)}</div>
-            </div>
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            </button>
+            <button onClick={() => navigate('/admin/reports')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Balance Issued</div>
               <div className="mt-1 text-xl font-extrabold text-coral-600">{formatAmount(totalIssued)}</div>
-            </div>
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            </button>
+            <button onClick={() => navigate('/admin/transactions')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Transactions</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{filtered.length}</div>
-            </div>
-            <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50">
+            </button>
+            <button onClick={() => navigate('/admin/agents')} className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 text-left hover:shadow-md transition-shadow">
               <div className="text-xs text-slate-500 font-semibold">Active Agents</div>
               <div className="mt-1 text-xl font-extrabold text-slate-900">{activeOps}</div>
-            </div>
+            </button>
           </div>
         </SectionCard>
 
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
         }>
           <div className="space-y-1">
             {filtered.slice(0, 6).map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0">
+              <button key={tx.id} onClick={() => navigate('/admin/transactions')} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
                 <div className="min-w-0">
                   <div className="font-semibold text-sm text-slate-900 truncate">{tx.bingoCenterUsername}</div>
                   <div className="text-xs text-slate-400">{formatDate(tx.timestamp)} • by {tx.debitedBy}</div>
@@ -204,7 +204,7 @@ export default function AdminDashboard() {
                   <div className="text-sm font-bold text-slate-900">{formatAmount(tx.actualAmount)}</div>
                   <div className="text-xs text-coral-600">→ {formatAmount(tx.generatedAmount)}</div>
                 </div>
-              </div>
+              </button>
             ))}
             {filtered.length === 0 && <EmptyState text="No transactions in this period." />}
           </div>
@@ -217,13 +217,13 @@ export default function AdminDashboard() {
             {centers.slice(0, 5).map((c) => {
               const status = Number(c.balance) > 0 ? 'Active' : 'Inactive'
               return (
-                <div key={c.username} className="flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0">
+                <button key={c.username} onClick={() => navigate(`/centers/${c.username}`)} className="w-full flex items-center justify-between py-2.5 border-b border-coral-100/50 last:border-0 text-left hover:opacity-80 transition-opacity">
                   <div className="min-w-0">
                     <div className="font-semibold text-sm text-slate-900 truncate">{c.full_name}</div>
                     <div className="text-xs text-slate-400 font-mono">{c.username}</div>
                   </div>
                   <span className={`text-xs font-bold px-2.5 py-1 rounded-full border shrink-0 ml-2 ${status === 'Active' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>{status}</span>
-                </div>
+                </button>
               )
             })}
             {centers.length === 0 && <EmptyState text="No centers assigned." />}

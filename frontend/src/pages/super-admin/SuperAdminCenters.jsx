@@ -253,9 +253,7 @@ export default function SuperAdminCenters() {
         </div>
       ))}{filtered.length === 0 && <EmptyState text="No centers match your filters." />}</div>
 
-      <button onClick={openWizard} className="fixed bottom-24 right-6 lg:bottom-8 lg:right-8 z-40 w-14 h-14 rounded-full bg-[#1976d2] text-white shadow-lg shadow-[#1976d2]/30 hover:bg-[#1565c0] active:scale-95 transition-all duration-150 flex items-center justify-center">
-        <span className="material-symbols-outlined text-[28px]">add</span>
-      </button>
+
     </div>
   )
 }
