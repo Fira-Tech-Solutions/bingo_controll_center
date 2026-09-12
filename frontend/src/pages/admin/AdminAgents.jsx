@@ -191,7 +191,9 @@ export default function AdminAgents() {
         {filtered.length === 0 && <EmptyState text="No agents found." />}
       </div>
 
-
+      <button onClick={() => { setShowCreate(true); setFormStep('form'); }} className="fixed bottom-24 right-6 lg:bottom-8 lg:right-8 z-40 w-14 h-14 rounded-full bg-[#2563eb] text-white shadow-lg shadow-blue-500/30 hover:bg-[#1d4ed8] active:scale-95 transition-all duration-150 flex items-center justify-center">
+        <span className="material-symbols-outlined text-[28px]">add</span>
+      </button>
     </div>
   )
 }

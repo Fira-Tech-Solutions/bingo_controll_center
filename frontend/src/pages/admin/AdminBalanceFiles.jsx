@@ -359,6 +359,10 @@ export default function AdminBalanceFiles() {
         {filtered.length === 0 && <EmptyState text="No balance files found." />}
       </div>
 
+      <button onClick={openWizard} className="fixed bottom-24 right-6 lg:bottom-8 lg:right-8 z-40 w-14 h-14 rounded-full bg-[#2563eb] text-white shadow-lg shadow-blue-500/30 hover:bg-[#1d4ed8] active:scale-95 transition-all duration-150 flex items-center justify-center">
+        <span className="material-symbols-outlined text-[28px]">add</span>
+      </button>
+
       <div className="lg:hidden space-y-3">{filtered.map((tx) => (
         <div key={tx.id} className="bg-white rounded-2xl p-4 shadow-soft border border-coral-100/50">
           <div className="flex items-center justify-between"><span className="text-xs font-mono font-bold text-slate-900">BAL-{String(tx.id).padStart(4, '0')}</span><span className="text-xs text-slate-500">{formatDate(tx.timestamp)}</span></div>
