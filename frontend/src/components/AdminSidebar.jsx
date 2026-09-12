@@ -100,7 +100,7 @@ export default function AdminSidebar({ mobileOpen, onClose }) {
 
   return (
     <>
-      <aside className="hidden lg:flex w-72 bg-[#0e1526] shadow-soft border-r border-white/[0.07] flex-col shrink-0">
+      <aside className="hidden lg:flex fixed top-0 left-0 w-72 h-screen bg-[#0e1526] shadow-soft border-r border-white/[0.07] flex-col z-30">
         {sidebarContent}
       </aside>
     </>

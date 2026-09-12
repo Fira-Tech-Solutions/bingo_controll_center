@@ -110,7 +110,7 @@ function AppShell() {
     <div className="min-h-screen bg-[#0b0f19] text-white">
       <div className="flex min-h-screen">
         <Sidebar />
-        <div className="flex-1 min-w-0 pb-20 lg:pb-0">
+        <div className="flex-1 min-w-0 pb-20 lg:pb-0 lg:ml-72">
           <header className="sticky top-0 z-20 bg-[#0e1526]/80 backdrop-blur-md border-b border-white/[0.07] px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="min-w-0">
