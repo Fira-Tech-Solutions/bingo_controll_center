@@ -21,8 +21,8 @@ module.exports = {
       type: 'VARCHAR(20)',
       allowNull: true,
     });
-    await queryInterface.addColumn('bingo_centers', 'email', {
-      type: 'VARCHAR(150)',
+    await queryInterface.addColumn('bingo_centers', 'additional_contact', {
+      type: 'VARCHAR(255)',
       allowNull: true,
     });
     await queryInterface.addColumn('bingo_centers', 'address', {
@@ -42,7 +42,7 @@ module.exports = {
   async down(queryInterface) {
     await queryInterface.removeColumn('bingo_centers', 'owner_name');
     await queryInterface.removeColumn('bingo_centers', 'phone');
-    await queryInterface.removeColumn('bingo_centers', 'email');
+    await queryInterface.removeColumn('bingo_centers', 'additional_contact');
     await queryInterface.removeColumn('bingo_centers', 'address');
     await queryInterface.removeColumn('bingo_centers', 'region');
     await queryInterface.removeColumn('bingo_centers', 'notes');

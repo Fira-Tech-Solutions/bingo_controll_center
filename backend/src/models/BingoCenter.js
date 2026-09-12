@@ -46,8 +46,8 @@ const BingoCenter = sequelize.define('BingoCenter', {
     type: DataTypes.STRING(20),
     allowNull: true,
   },
-  email: {
-    type: DataTypes.STRING(150),
+  additional_contact: {
+    type: DataTypes.STRING(255),
     allowNull: true,
   },
   address: {

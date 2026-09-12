@@ -59,7 +59,7 @@ exports.list = async (req, res, next) => {
         onlinePaidBalance: onlineBalances[c.username]?.paid_balance || 0,
         owner_name: c.owner_name,
         phone: c.phone,
-        email: c.email,
+        additional_contact: c.additional_contact,
         address: c.address,
         region: c.region,
         notes: c.notes,
@@ -72,7 +72,7 @@ exports.list = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const { full_name, username, password, mac_address, balance, actualAmount, createdBy, owner_name, phone, email, address, region, notes } = req.body;
+    const { full_name, username, password, mac_address, balance, actualAmount, createdBy, owner_name, phone, additional_contact, address, region, notes } = req.body;
 
     if (!full_name || !username || !password || !mac_address || balance === undefined || actualAmount === undefined) {
       return res.status(400).json({ success: false, error: 'All fields are required' });
@@ -110,7 +110,7 @@ exports.create = async (req, res, next) => {
         created_by: createdBy || 'system',
         owner_name: owner_name || null,
         phone: phone || null,
-        email: email || null,
+        additional_contact: additional_contact || null,
         address: address || null,
         region: region || null,
         notes: notes || null,
@@ -158,7 +158,7 @@ exports.create = async (req, res, next) => {
         createdAt: result.center.createdAt || result.center.created_at,
         owner_name: result.center.owner_name,
         phone: result.center.phone,
-        email: result.center.email,
+        additional_contact: result.center.additional_contact,
         address: result.center.address,
         region: result.center.region,
         notes: result.center.notes,

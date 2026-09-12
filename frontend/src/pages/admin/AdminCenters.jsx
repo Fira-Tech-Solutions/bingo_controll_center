@@ -19,7 +19,7 @@ export default function AdminCenters() {
 
   const [wizardOpen, setWizardOpen] = useState(false)
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState({ full_name: '', username: '', password: '', mac_address: '', owner_name: '', phone: '', email: '', address: '', region: '', notes: '' })
+  const [form, setForm] = useState({ full_name: '', username: '', password: '', mac_address: '', owner_name: '', phone: '', additional_contact: '', address: '', region: '', notes: '' })
   const [creating, setCreating] = useState(false)
   const [createResult, setCreateResult] = useState(null)
 
@@ -64,7 +64,7 @@ export default function AdminCenters() {
   function openWizard() {
     setWizardOpen(true)
     setStep(0)
-    setForm({ full_name: '', username: '', password: '', mac_address: '', owner_name: '', phone: '', email: '', address: '', region: '', notes: '' })
+    setForm({ full_name: '', username: '', password: '', mac_address: '', owner_name: '', phone: '', additional_contact: '', address: '', region: '', notes: '' })
     setCreateResult(null)
     setError('')
   }
@@ -123,7 +123,7 @@ export default function AdminCenters() {
         createdBy: user.username,
         owner_name: form.owner_name || null,
         phone: form.phone || null,
-        email: form.email || null,
+        additional_contact: form.additional_contact || null,
         address: form.address || null,
         region: form.region || null,
         notes: form.notes || null,
@@ -243,10 +243,10 @@ export default function AdminCenters() {
                           placeholder="+251 9XX XXX XXX" />
                       </div>
                       <div>
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Email</label>
-                        <input name="email" type="email" value={form.email} onChange={handleFormChange}
+                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Additional Contact</label>
+                        <input name="additional_contact" value={form.additional_contact} onChange={handleFormChange}
                           className="w-full h-12 px-4 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all"
-                          placeholder="owner@email.com" />
+                          placeholder="Alt phone, telegram, etc." />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -290,7 +290,7 @@ export default function AdminCenters() {
                     <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">MAC Address</span><span className="text-sm font-bold text-slate-900 font-mono">{form.mac_address}</span></div>
                     {form.owner_name && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Owner</span><span className="text-sm font-bold text-slate-900">{form.owner_name}</span></div>}
                     {form.phone && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Phone</span><span className="text-sm font-bold text-slate-900">{form.phone}</span></div>}
-                    {form.email && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Email</span><span className="text-sm font-bold text-slate-900">{form.email}</span></div>}
+                    {form.additional_contact && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Additional Contact</span><span className="text-sm font-bold text-slate-900">{form.additional_contact}</span></div>}
                     {form.region && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Region</span><span className="text-sm font-bold text-slate-900">{form.region}</span></div>}
                     {form.address && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Address</span><span className="text-sm font-bold text-slate-900">{form.address}</span></div>}
                     {form.notes && <div><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Notes</span><p className="mt-1 text-sm text-slate-700">{form.notes}</p></div>}
