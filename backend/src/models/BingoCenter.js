@@ -38,6 +38,30 @@ const BingoCenter = sequelize.define('BingoCenter', {
     type: DataTypes.STRING(50),
     allowNull: false,
   },
+  owner_name: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
+  },
+  email: {
+    type: DataTypes.STRING(150),
+    allowNull: true,
+  },
+  address: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  region: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+  },
+  notes: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 }, {
   tableName: 'bingo_centers',
   timestamps: true,

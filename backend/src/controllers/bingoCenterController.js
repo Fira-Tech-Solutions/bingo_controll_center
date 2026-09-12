@@ -57,6 +57,12 @@ exports.list = async (req, res, next) => {
         onlineBalance: onlineBalances[c.username]?.balance || 0,
         onlineActualBalance: onlineBalances[c.username]?.actual_balance || 0,
         onlinePaidBalance: onlineBalances[c.username]?.paid_balance || 0,
+        owner_name: c.owner_name,
+        phone: c.phone,
+        email: c.email,
+        address: c.address,
+        region: c.region,
+        notes: c.notes,
       })),
     });
   } catch (err) {
@@ -66,7 +72,7 @@ exports.list = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const { full_name, username, password, mac_address, balance, actualAmount, createdBy } = req.body;
+    const { full_name, username, password, mac_address, balance, actualAmount, createdBy, owner_name, phone, email, address, region, notes } = req.body;
 
     if (!full_name || !username || !password || !mac_address || balance === undefined || actualAmount === undefined) {
       return res.status(400).json({ success: false, error: 'All fields are required' });
@@ -102,6 +108,12 @@ exports.create = async (req, res, next) => {
         mac_address,
         balance: parseFloat(actualAmount),
         created_by: createdBy || 'system',
+        owner_name: owner_name || null,
+        phone: phone || null,
+        email: email || null,
+        address: address || null,
+        region: region || null,
+        notes: notes || null,
       }, { transaction: t });
 
       const recharge = await RechargeHistory.create({
@@ -144,6 +156,12 @@ exports.create = async (req, res, next) => {
         mac_address: result.center.mac_address,
         createdBy: result.center.created_by,
         createdAt: result.center.createdAt || result.center.created_at,
+        owner_name: result.center.owner_name,
+        phone: result.center.phone,
+        email: result.center.email,
+        address: result.center.address,
+        region: result.center.region,
+        notes: result.center.notes,
       },
       encryptedFile: encFile,
     });

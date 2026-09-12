@@ -97,6 +97,19 @@ export default function AdminCenterDetail() {
             <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">MAC Address</div><div className="font-bold text-slate-900 mt-1 font-mono">{center?.mac_address}</div></div>
             <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">Status</div><div className="font-bold text-emerald-600 mt-1">Active</div></div>
           </div>
+          {(center?.owner_name || center?.phone || center?.email || center?.region || center?.address || center?.notes) && (
+            <>
+              <h3 className="font-extrabold text-lg text-slate-900 tracking-tight mt-6 mb-4">Registration Info</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {center?.owner_name && <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">Owner</div><div className="font-bold text-slate-900 mt-1">{center.owner_name}</div></div>}
+                {center?.phone && <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">Phone</div><div className="font-bold text-slate-900 mt-1">{center.phone}</div></div>}
+                {center?.email && <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">Email</div><div className="font-bold text-slate-900 mt-1">{center.email}</div></div>}
+                {center?.region && <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">Region</div><div className="font-bold text-slate-900 mt-1">{center.region}</div></div>}
+                {center?.address && <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50"><div className="text-xs text-slate-500">Address</div><div className="font-bold text-slate-900 mt-1">{center.address}</div></div>}
+                {center?.notes && <div className="p-4 rounded-xl bg-coral-50/50 border border-coral-100/50 md:col-span-2"><div className="text-xs text-slate-500">Notes</div><div className="font-bold text-slate-900 mt-1">{center.notes}</div></div>}
+              </div>
+            </>
+          )}
         </section>
       )}
 

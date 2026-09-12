@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { Banner, EmptyState, formatAmount, formatDate, downloadEncryptedFile } from '../../components/UI'
 
 const STATUS_FILTERS = ['All', 'Active', 'Inactive']
-const STEPS = ['info', 'review', 'done']
+const STEPS = ['info', 'contact', 'review', 'done']
 
 export default function SuperAdminCenters() {
   const { token, user } = useAuth()
@@ -19,7 +19,7 @@ export default function SuperAdminCenters() {
 
   const [wizardOpen, setWizardOpen] = useState(false)
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState({ full_name: '', username: '', password: '', mac_address: '' })
+  const [form, setForm] = useState({ full_name: '', username: '', password: '', mac_address: '', owner_name: '', phone: '', email: '', address: '', region: '', notes: '' })
   const [creating, setCreating] = useState(false)
   const [createResult, setCreateResult] = useState(null)
 
@@ -65,13 +65,13 @@ export default function SuperAdminCenters() {
   function openWizard() {
     setWizardOpen(true)
     setStep(0)
-    setForm({ full_name: '', username: '', password: '', mac_address: '' })
+    setForm({ full_name: '', username: '', password: '', mac_address: '', owner_name: '', phone: '', email: '', address: '', region: '', notes: '' })
     setCreateResult(null)
     setError('')
   }
 
   function closeWizard() { setWizardOpen(false); setStep(0); setCreateResult(null) }
-  function goBack() { if (step > 0 && step < 2) setStep(step - 1); else closeWizard() }
+  function goBack() { if (step > 0 && step < 3) setStep(step - 1); else closeWizard() }
   function handleFormChange(e) {
     const { name, value } = e.target
     if (name === 'mac_address') {
@@ -94,13 +94,13 @@ export default function SuperAdminCenters() {
     setError(''); return true
   }
 
-  function nextStep() { if (step === 0 && validateInfo()) setStep(1) }
+  function nextStep() { if (step === 0 && validateInfo()) setStep(1); else if (step === 1) setStep(2) }
 
   async function handleCreate() {
     setCreating(true); setError('')
     try {
-      const res = await api.createCenter(token, { full_name: form.full_name, username: form.username, password: form.password, mac_address: form.mac_address, balance: 0, actualAmount: 0, createdBy: user.username })
-      setCreateResult(res); setStep(2); await loadData()
+      const res = await api.createCenter(token, { full_name: form.full_name, username: form.username, password: form.password, mac_address: form.mac_address, balance: 0, actualAmount: 0, createdBy: user.username, owner_name: form.owner_name || null, phone: form.phone || null, email: form.email || null, address: form.address || null, region: form.region || null, notes: form.notes || null })
+      setCreateResult(res); setStep(3); await loadData()
     } catch (err) { setError(err.message) } finally { setCreating(false) }
   }
 
@@ -158,6 +158,27 @@ export default function SuperAdminCenters() {
               {step === 1 && (
                 <div className="animate-fade-up space-y-5">
                   <div className="text-center">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-coral-50 flex items-center justify-center mb-3"><span className="material-symbols-outlined text-[28px] text-coral-500">contact_mail</span></div>
+                    <h3 className="font-extrabold text-xl text-slate-900">Registration Info</h3>
+                    <p className="text-sm text-slate-500 mt-1">Owner and contact details (optional)</p>
+                  </div>
+                  <div className="space-y-4">
+                    <div><label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Owner Name</label><input name="owner_name" value={form.owner_name} onChange={handleFormChange} className="w-full h-12 px-4 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all" placeholder="e.g. Ahmed Hassan" /></div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Phone</label><input name="phone" value={form.phone} onChange={handleFormChange} className="w-full h-12 px-4 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all" placeholder="+251 9XX XXX XXX" /></div>
+                      <div><label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Email</label><input name="email" type="email" value={form.email} onChange={handleFormChange} className="w-full h-12 px-4 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all" placeholder="owner@email.com" /></div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Region / City</label><input name="region" value={form.region} onChange={handleFormChange} className="w-full h-12 px-4 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all" placeholder="e.g. Addis Ababa" /></div>
+                      <div><label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Address</label><input name="address" value={form.address} onChange={handleFormChange} className="w-full h-12 px-4 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all" placeholder="Street, area..." /></div>
+                    </div>
+                    <div><label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Notes</label><textarea name="notes" value={form.notes} onChange={handleFormChange} rows={3} className="w-full px-4 py-3 rounded-2xl bg-slate-50 focus:bg-white outline-none border-2 border-slate-100 focus:border-coral-400 text-sm font-medium text-slate-800 transition-all resize-none" placeholder="Any additional registration notes..." /></div>
+                  </div>
+                </div>
+              )}
+              {step === 2 && (
+                <div className="animate-fade-up space-y-5">
+                  <div className="text-center">
                     <div className="w-14 h-14 mx-auto rounded-2xl bg-coral-50 flex items-center justify-center mb-3"><span className="material-symbols-outlined text-[28px] text-coral-500">fact_check</span></div>
                     <h3 className="font-extrabold text-xl text-slate-900">Review & Confirm</h3>
                     <p className="text-sm text-slate-500 mt-1">Confirm the center details</p>
@@ -167,12 +188,18 @@ export default function SuperAdminCenters() {
                     <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Username</span><span className="text-sm font-bold text-slate-900 font-mono">{form.username}</span></div>
                     <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Password</span><span className="text-sm font-bold text-slate-900 font-mono">{form.password}</span></div>
                     <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">MAC Address</span><span className="text-sm font-bold text-slate-900 font-mono">{form.mac_address}</span></div>
+                    {form.owner_name && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Owner</span><span className="text-sm font-bold text-slate-900">{form.owner_name}</span></div>}
+                    {form.phone && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Phone</span><span className="text-sm font-bold text-slate-900">{form.phone}</span></div>}
+                    {form.email && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Email</span><span className="text-sm font-bold text-slate-900">{form.email}</span></div>}
+                    {form.region && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Region</span><span className="text-sm font-bold text-slate-900">{form.region}</span></div>}
+                    {form.address && <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Address</span><span className="text-sm font-bold text-slate-900">{form.address}</span></div>}
+                    {form.notes && <div><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Notes</span><p className="mt-1 text-sm text-slate-700">{form.notes}</p></div>}
                     <div className="h-px bg-slate-200" />
                     <div className="flex justify-between items-center"><span className="text-xs font-bold uppercase tracking-wider text-slate-400">Initial Balance</span><span className="text-sm font-bold text-slate-400">0.00 ETB</span></div>
                   </div>
                 </div>
               )}
-              {step === 2 && createResult && (
+              {step === 3 && createResult && (
                 <div className="animate-fade-up text-center space-y-4">
                   <div className="w-20 h-20 mx-auto rounded-full bg-emerald-50 flex items-center justify-center animate-pop-in"><svg className="w-10 h-10 success-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="8 12 11 15 16 9" /></svg></div>
                   <div><h3 className="font-extrabold text-xl text-slate-900">Center Created!</h3><p className="text-sm text-slate-500 mt-1">Encrypted terminal file generated</p></div>
@@ -195,19 +222,19 @@ export default function SuperAdminCenters() {
               )}
             </div>
 
-            {step < 2 && (
+            {step < 3 && (
               <div className="shrink-0 px-5 py-4 border-t border-slate-100 flex gap-3 bg-white">
                 {step > 0 && <button onClick={goBack} className="px-5 py-3 rounded-2xl bg-slate-100 text-slate-600 font-semibold text-sm hover:bg-slate-200 active:scale-[0.97] transition-all">Back</button>}
-                <button onClick={step === 1 ? handleCreate : nextStep} disabled={creating}
+                <button onClick={step === 2 ? handleCreate : nextStep} disabled={creating}
                   className="flex-1 py-3 rounded-2xl bg-coral-500 text-white font-bold text-sm shadow-lg shadow-coral-500/25 hover:bg-coral-600 active:scale-[0.97] transition-all disabled:opacity-40 disabled:active:scale-100 flex items-center justify-center gap-2">
                   {creating ? <><span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>Creating...</> :
-                   step === 1 ? <><span className="material-symbols-outlined text-[18px]">check_circle</span>Create Center</> :
+                   step === 2 ? <><span className="material-symbols-outlined text-[18px]">check_circle</span>Create Center</> :
                    <><span className="material-symbols-outlined text-[18px]">arrow_forward</span>Continue</>}
                 </button>
                 <button onClick={step === 0 ? closeWizard : goBack} className="px-5 py-3 rounded-2xl text-slate-400 font-semibold text-sm hover:text-slate-600 transition-colors">Cancel</button>
               </div>
             )}
-            {step === 2 && <div className="shrink-0 px-5 py-4 border-t border-slate-100 bg-white"><button onClick={closeWizard} className="w-full py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 active:scale-[0.97] transition-all">Done</button></div>}
+            {step === 3 && <div className="shrink-0 px-5 py-4 border-t border-slate-100 bg-white"><button onClick={closeWizard} className="w-full py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 active:scale-[0.97] transition-all">Done</button></div>}
           </div>
         </div>
       )}
