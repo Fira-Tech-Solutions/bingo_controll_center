@@ -6,6 +6,9 @@ import MobileMoreSheet from './components/MobileMoreSheet'
 import AdminSidebar from './components/AdminSidebar'
 import AdminBottomNav from './components/AdminBottomNav'
 import AdminMoreSheet from './components/AdminMoreSheet'
+import AgentSidebar from './components/AgentSidebar'
+import AgentBottomNav from './components/AgentBottomNav'
+import AgentMoreSheet from './components/AgentMoreSheet'
 import QueryProvider from './QueryProvider'
 import { useState, useRef, useEffect, Suspense, lazy } from 'react'
 
@@ -47,6 +50,19 @@ const AdminNotifications = lazy(() => import('./pages/admin/AdminNotifications')
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'))
 const AdminSecurity = lazy(() => import('./pages/admin/AdminSecurity'))
 const AdminMore = lazy(() => import('./pages/admin/AdminMore'))
+
+// Agent pages
+const AgentDashboard = lazy(() => import('./pages/agent/AgentDashboard'))
+const AgentCenters = lazy(() => import('./pages/agent/AgentCenters'))
+const AgentCenterDetail = lazy(() => import('./pages/agent/AgentCenterDetail'))
+const AgentTransactions = lazy(() => import('./pages/agent/AgentTransactions'))
+const AgentPackages = lazy(() => import('./pages/agent/AgentPackages'))
+const AgentBalanceFiles = lazy(() => import('./pages/agent/AgentBalanceFiles'))
+const AgentCredentialFiles = lazy(() => import('./pages/agent/AgentCredentialFiles'))
+const AgentActivity = lazy(() => import('./pages/agent/AgentActivity'))
+const AgentNotifications = lazy(() => import('./pages/agent/AgentNotifications'))
+const AgentProfile = lazy(() => import('./pages/agent/AgentProfile'))
+const AgentSecurity = lazy(() => import('./pages/agent/AgentSecurity'))
 
 const TITLES = {
   '/': 'Dashboard',
@@ -90,9 +106,22 @@ function AppShell() {
   const profileRef = useRef(null)
   const { pathname } = useLocation()
   const isSuperAdmin = user?.role === 'SUPER_ADMIN'
-  const Sidebar = isSuperAdmin ? SuperAdminSidebar : AdminSidebar
-  const BottomNav = isSuperAdmin ? MobileBottomNav : AdminBottomNav
-  const MoreSheet = isSuperAdmin ? MobileMoreSheet : AdminMoreSheet
+  const isAgent = user?.role === 'AGENT'
+
+  let Sidebar, BottomNav, MoreSheet
+  if (isSuperAdmin) {
+    Sidebar = SuperAdminSidebar
+    BottomNav = MobileBottomNav
+    MoreSheet = MobileMoreSheet
+  } else if (isAgent) {
+    Sidebar = AgentSidebar
+    BottomNav = AgentBottomNav
+    MoreSheet = AgentMoreSheet
+  } else {
+    Sidebar = AdminSidebar
+    BottomNav = AdminBottomNav
+    MoreSheet = AdminMoreSheet
+  }
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -134,7 +163,7 @@ function AppShell() {
                   </div>
                   <div className="px-4 py-3 space-y-2">
                     <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-[#94a3b8]">mail</span><span className="text-[#e2e8f0] truncate">{user?.email || '—'}</span></div>
-                    <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-[#94a3b8]">badge</span><span className="text-[#e2e8f0]">{isSuperAdmin ? 'Super Admin' : 'Admin'}</span></div>
+                    <div className="flex items-center gap-2 text-sm"><span className="material-symbols-outlined text-[16px] text-[#94a3b8]">badge</span><span className="text-[#e2e8f0]">{isSuperAdmin ? 'Super Admin' : isAgent ? 'Agent' : 'Admin'}</span></div>
                   </div>
                   <div className="border-t border-white/[0.08] pt-2 px-2">
                     <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-[#ef4444] hover:bg-[#ef4444]/10 text-sm font-semibold transition-colors">
@@ -149,21 +178,21 @@ function AppShell() {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Shared routes - core pages eagerly loaded */}
-                <Route index element={isSuperAdmin ? <SuperAdminDashboard /> : <AdminDashboard />} />
-                <Route path="centers" element={isSuperAdmin ? <SuperAdminCenters /> : <AdminCenters />} />
-                <Route path="centers/:id" element={isSuperAdmin ? <SuperAdminCenterDetail /> : <AdminCenterDetail />} />
+                <Route index element={isSuperAdmin ? <SuperAdminDashboard /> : isAgent ? <AgentDashboard /> : <AdminDashboard />} />
+                <Route path="centers" element={isSuperAdmin ? <SuperAdminCenters /> : isAgent ? <AgentCenters /> : <AdminCenters />} />
+                <Route path="centers/:id" element={isSuperAdmin ? <SuperAdminCenterDetail /> : isAgent ? <AgentCenterDetail /> : <AdminCenterDetail />} />
                 <Route path="users/agents" element={isSuperAdmin ? <SuperAdminAgents /> : <Navigate to="/agents" replace />} />
-                <Route path="agents" element={isSuperAdmin ? <Navigate to="/users/agents" replace /> : <AdminAgents />} />
-                <Route path="packages" element={isSuperAdmin ? <SuperAdminPackages /> : <AdminPackages />} />
-                <Route path="transactions" element={isSuperAdmin ? <SuperAdminTransactions /> : <AdminTransactions />} />
-                <Route path="files/balance" element={isSuperAdmin ? <SuperAdminBalanceFiles /> : <AdminBalanceFiles />} />
-                <Route path="files/credentials" element={isSuperAdmin ? <SuperAdminCredentialFiles /> : <AdminCredentialFiles />} />
-                <Route path="reports" element={isSuperAdmin ? <SuperAdminReports /> : <AdminReports />} />
-                <Route path="activity" element={isSuperAdmin ? <SuperAdminActivity /> : <AdminActivity />} />
-                <Route path="notifications" element={isSuperAdmin ? <SuperAdminNotifications /> : <AdminNotifications />} />
-                <Route path="profile" element={isSuperAdmin ? <SuperAdminProfile /> : <AdminProfile />} />
-                <Route path="security" element={isSuperAdmin ? <SuperAdminSecurity /> : <AdminSecurity />} />
-                <Route path="more" element={isSuperAdmin ? <SuperAdminMore /> : <AdminMore />} />
+                <Route path="agents" element={isSuperAdmin ? <Navigate to="/users/agents" replace /> : isAgent ? <Navigate to="/" replace /> : <AdminAgents />} />
+                <Route path="packages" element={isSuperAdmin ? <SuperAdminPackages /> : isAgent ? <AgentPackages /> : <AdminPackages />} />
+                <Route path="transactions" element={isSuperAdmin ? <SuperAdminTransactions /> : isAgent ? <AgentTransactions /> : <AdminTransactions />} />
+                <Route path="files/balance" element={isSuperAdmin ? <SuperAdminBalanceFiles /> : isAgent ? <AgentBalanceFiles /> : <AdminBalanceFiles />} />
+                <Route path="files/credentials" element={isSuperAdmin ? <SuperAdminCredentialFiles /> : isAgent ? <AgentCredentialFiles /> : <AdminCredentialFiles />} />
+                <Route path="reports" element={isSuperAdmin ? <SuperAdminReports /> : isAgent ? <Navigate to="/" replace /> : <AdminReports />} />
+                <Route path="activity" element={isSuperAdmin ? <SuperAdminActivity /> : isAgent ? <AgentActivity /> : <AdminActivity />} />
+                <Route path="notifications" element={isSuperAdmin ? <SuperAdminNotifications /> : isAgent ? <AgentNotifications /> : <AdminNotifications />} />
+                <Route path="profile" element={isSuperAdmin ? <SuperAdminProfile /> : isAgent ? <AgentProfile /> : <AdminProfile />} />
+                <Route path="security" element={isSuperAdmin ? <SuperAdminSecurity /> : isAgent ? <AgentSecurity /> : <AdminSecurity />} />
+                <Route path="more" element={isSuperAdmin ? <SuperAdminMore /> : isAgent ? <Navigate to="/" replace /> : <AdminMore />} />
 
                 {/* Super Admin only routes */}
                 {isSuperAdmin && (

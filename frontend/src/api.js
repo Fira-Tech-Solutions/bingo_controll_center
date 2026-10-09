@@ -65,6 +65,23 @@ export const api = {
 
   // Profile
   updateProfile: (token, body) => request('/users/profile', { method: 'PUT', token, body }),
+
+  // Agents (admin management)
+  getAgents: (token) => request('/agents', { token }),
+  createAgent: (token, body) => request('/agents', { method: 'POST', token, body }),
+  toggleAgentBan: (token, username) => request(`/agents/${encodeURIComponent(username)}/ban`, { method: 'PUT', token }),
+  resetAgentPassword: (token, username, body) => request(`/agents/${encodeURIComponent(username)}/reset-password`, { method: 'PUT', token, body }),
+  deleteAgent: (token, username) => request(`/agents/${encodeURIComponent(username)}`, { method: 'DELETE', token }),
+  assignCenterToAgent: (token, body) => request('/agents/assign-center', { method: 'POST', token, body }),
+  unassignCenterFromAgent: (token, agentUsername, centerUsername) => request(`/agents/${encodeURIComponent(agentUsername)}/centers/${encodeURIComponent(centerUsername)}`, { method: 'DELETE', token }),
+  getAgentAssignments: (token, username) => request(`/agents/${encodeURIComponent(username)}/assignments`, { token }),
+
+  // Agent-scoped endpoints
+  getMyCenters: (token) => request('/agents/my/centers', { token }),
+  getMyCenterDetail: (token, username) => request(`/agents/my/centers/${encodeURIComponent(username)}`, { token }),
+  getMyTransactions: (token) => request('/agents/my/transactions', { token }),
+  getMyAnalytics: (token) => request('/agents/my/analytics', { token }),
+  getMyPackages: (token) => request('/agents/my/packages', { token }),
 }
 
 export { API_BASE }

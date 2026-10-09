@@ -97476,7 +97476,7 @@ var require_User = __commonJS({
         unique: true
       },
       role: {
-        type: DataTypes.ENUM("SUPER_ADMIN", "ADMIN", "OPERATOR"),
+        type: DataTypes.ENUM("SUPER_ADMIN", "ADMIN", "OPERATOR", "AGENT"),
         allowNull: false,
         defaultValue: "OPERATOR"
       },
@@ -97539,6 +97539,30 @@ var require_BingoCenter = __commonJS({
       created_by: {
         type: DataTypes.STRING(50),
         allowNull: false
+      },
+      owner_name: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+      },
+      phone: {
+        type: DataTypes.STRING(20),
+        allowNull: true
+      },
+      additional_contact: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+      },
+      address: {
+        type: DataTypes.STRING(255),
+        allowNull: true
+      },
+      region: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+      },
+      notes: {
+        type: DataTypes.TEXT,
+        allowNull: true
       }
     }, {
       tableName: "bingo_centers",
@@ -97781,6 +97805,43 @@ var require_Package = __commonJS({
   }
 });
 
+// src/models/AgentCenterAssignment.js
+var require_AgentCenterAssignment = __commonJS({
+  "src/models/AgentCenterAssignment.js"(exports2, module2) {
+    var { DataTypes } = require_lib8();
+    var { sequelize } = require_database();
+    var AgentCenterAssignment = sequelize.define("AgentCenterAssignment", {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      agent_username: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+      },
+      center_username: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+      },
+      assigned_by: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+      }
+    }, {
+      tableName: "agent_center_assignments",
+      timestamps: true,
+      underscored: true,
+      indexes: [
+        { fields: ["agent_username"] },
+        { fields: ["center_username"] },
+        { unique: true, fields: ["agent_username", "center_username"] }
+      ]
+    });
+    module2.exports = AgentCenterAssignment;
+  }
+});
+
 // src/models/index.js
 var require_models = __commonJS({
   "src/models/index.js"(exports2, module2) {
@@ -97791,6 +97852,7 @@ var require_models = __commonJS({
     var PasswordResetToken = require_PasswordResetToken();
     var OnlineTopup = require_OnlineTopup();
     var Package = require_Package();
+    var AgentCenterAssignment = require_AgentCenterAssignment();
     User.hasMany(Session, { foreignKey: "user_id" });
     Session.belongsTo(User, { foreignKey: "user_id" });
     BingoCenter.belongsTo(User, { foreignKey: "created_by", targetKey: "username" });
@@ -97800,6 +97862,8 @@ var require_models = __commonJS({
     OnlineTopup.belongsTo(BingoCenter, { foreignKey: "username", targetKey: "username" });
     RechargeHistory.belongsTo(Package, { foreignKey: "package_id", as: "package" });
     Package.hasMany(RechargeHistory, { foreignKey: "package_id" });
+    AgentCenterAssignment.belongsTo(BingoCenter, { foreignKey: "center_username", targetKey: "username" });
+    BingoCenter.hasMany(AgentCenterAssignment, { foreignKey: "center_username", sourceKey: "username" });
     module2.exports = {
       User,
       BingoCenter,
@@ -97807,7 +97871,8 @@ var require_models = __commonJS({
       Session,
       PasswordResetToken,
       OnlineTopup,
-      Package
+      Package,
+      AgentCenterAssignment
     };
   }
 });
@@ -100144,16 +100209,31 @@ var require_cryptoService = __commonJS({
 var require_bingoCenterController = __commonJS({
   "src/controllers/bingoCenterController.js"(exports2) {
     var bcrypt = require_bcryptjs();
-    var { BingoCenter, RechargeHistory, OnlineTopup, Package } = require_models();
+    var { BingoCenter, RechargeHistory, OnlineTopup, Package, AgentCenterAssignment } = require_models();
     var { generateUserFile, generateTopupFile } = require_cryptoService();
-    var { fn, col } = require_lib8();
+    var { fn, col, Op } = require_lib8();
     var { sequelize } = require_database();
     var logger = require_logger2();
+    async function getAgentAssignedCenterUsernames(agentUsername) {
+      const assignments = await AgentCenterAssignment.findAll({
+        where: { agent_username: agentUsername },
+        attributes: ["center_username"],
+        raw: true
+      });
+      return assignments.map((a) => a.center_username);
+    }
     exports2.list = async (req, res, next) => {
       try {
         const where2 = {};
         if (req.query.createdBy) {
           where2.created_by = req.query.createdBy;
+        }
+        if (req.user.role === "AGENT") {
+          const assigned = await getAgentAssignedCenterUsernames(req.user.username);
+          if (assigned.length === 0) {
+            return res.json({ success: true, data: [] });
+          }
+          where2.username = { [Op.in]: assigned };
         }
         const centers = await BingoCenter.findAll({ where: where2, order: [["created_at", "DESC"]] });
         const centerUsernames = centers.map((c) => c.username);
@@ -100196,7 +100276,13 @@ var require_bingoCenterController = __commonJS({
             createdAt: c.createdAt || c.created_at,
             onlineBalance: onlineBalances[c.username]?.balance || 0,
             onlineActualBalance: onlineBalances[c.username]?.actual_balance || 0,
-            onlinePaidBalance: onlineBalances[c.username]?.paid_balance || 0
+            onlinePaidBalance: onlineBalances[c.username]?.paid_balance || 0,
+            owner_name: c.owner_name,
+            phone: c.phone,
+            additional_contact: c.additional_contact,
+            address: c.address,
+            region: c.region,
+            notes: c.notes
           }))
         });
       } catch (err) {
@@ -100205,7 +100291,7 @@ var require_bingoCenterController = __commonJS({
     };
     exports2.create = async (req, res, next) => {
       try {
-        const { full_name, username, password, mac_address, balance, actualAmount, createdBy } = req.body;
+        const { full_name, username, password, mac_address, balance, actualAmount, createdBy, owner_name, phone, additional_contact, address, region, notes } = req.body;
         if (!full_name || !username || !password || !mac_address || balance === void 0 || actualAmount === void 0) {
           return res.status(400).json({ success: false, error: "All fields are required" });
         }
@@ -100232,7 +100318,13 @@ var require_bingoCenterController = __commonJS({
             password_plain: password,
             mac_address,
             balance: parseFloat(actualAmount),
-            created_by: createdBy || "system"
+            created_by: createdBy || "system",
+            owner_name: owner_name || null,
+            phone: phone || null,
+            additional_contact: additional_contact || null,
+            address: address || null,
+            region: region || null,
+            notes: notes || null
           }, { transaction: t });
           const recharge = await RechargeHistory.create({
             actual_amount: parseFloat(actualAmount),
@@ -100251,6 +100343,14 @@ var require_bingoCenterController = __commonJS({
           return { center, recharge, topup };
         });
         logger.info(`Bingo center created: ${result2.center.username} with initial balance ${balance}`);
+        if (req.user.role === "AGENT") {
+          await AgentCenterAssignment.create({
+            agent_username: req.user.username,
+            center_username: username,
+            assigned_by: req.user.username
+          });
+          logger.info(`Center ${username} auto-assigned to agent ${req.user.username}`);
+        }
         const encFile = generateUserFile(
           result2.center.username,
           password,
@@ -100267,7 +100367,13 @@ var require_bingoCenterController = __commonJS({
             balance: result2.center.balance,
             mac_address: result2.center.mac_address,
             createdBy: result2.center.created_by,
-            createdAt: result2.center.createdAt || result2.center.created_at
+            createdAt: result2.center.createdAt || result2.center.created_at,
+            owner_name: result2.center.owner_name,
+            phone: result2.center.phone,
+            additional_contact: result2.center.additional_contact,
+            address: result2.center.address,
+            region: result2.center.region,
+            notes: result2.center.notes
           },
           encryptedFile: encFile
         });
@@ -100313,6 +100419,14 @@ var require_bingoCenterController = __commonJS({
         const center = await BingoCenter.findOne({ where: { username: bingoCenterUsername } });
         if (!center) {
           return res.status(404).json({ success: false, error: "Transaction Failed: Bingo Center not found" });
+        }
+        if (req.user.role === "AGENT") {
+          const assignment = await AgentCenterAssignment.findOne({
+            where: { agent_username: req.user.username, center_username: bingoCenterUsername }
+          });
+          if (!assignment) {
+            return res.status(403).json({ success: false, error: "Center not assigned to you" });
+          }
         }
         const newBalance = parseFloat(center.balance) + actVal;
         await center.update({ balance: newBalance });
@@ -100365,6 +100479,14 @@ var require_bingoCenterController = __commonJS({
         const center = await BingoCenter.findOne({ where: { username } });
         if (!center) {
           return res.status(404).json({ success: false, error: "Bingo center not found" });
+        }
+        if (req.user.role === "AGENT") {
+          const assignment = await AgentCenterAssignment.findOne({
+            where: { agent_username: req.user.username, center_username: username }
+          });
+          if (!assignment) {
+            return res.status(403).json({ success: false, error: "Center not assigned to you" });
+          }
         }
         const encFile = generateUserFile(
           center.username,
@@ -100537,12 +100659,12 @@ var require_bingoCenters = __commonJS({
     var onlineTopupController = require_onlineTopupController();
     var router = Router();
     router.get("/", authenticate, bingoCenterController.list);
-    router.post("/", authenticate, requireRole("OPERATOR", "ADMIN"), bingoCenterController.create);
-    router.post("/recharge", authenticate, requireRole("OPERATOR", "ADMIN"), bingoCenterController.recharge);
+    router.post("/", authenticate, requireRole("OPERATOR", "ADMIN", "AGENT"), bingoCenterController.create);
+    router.post("/recharge", authenticate, requireRole("OPERATOR", "ADMIN", "AGENT"), bingoCenterController.recharge);
     router.get("/pending-balance", terminalAuth, onlineTopupController.getPendingBalance);
     router.post("/claim-balance", terminalAuth, onlineTopupController.claimBalance);
-    router.post("/online-topup", authenticate, requireRole("OPERATOR", "ADMIN"), onlineTopupController.addOnlineTopup);
-    router.post("/regenerate-user-file", authenticate, requireRole("OPERATOR", "ADMIN"), bingoCenterController.regenerateUserFile);
+    router.post("/online-topup", authenticate, requireRole("OPERATOR", "ADMIN", "AGENT"), onlineTopupController.addOnlineTopup);
+    router.post("/regenerate-user-file", authenticate, requireRole("OPERATOR", "ADMIN", "AGENT"), bingoCenterController.regenerateUserFile);
     router.delete("/:username", authenticate, requireRole("SUPER_ADMIN"), bingoCenterController.remove);
     module2.exports = router;
   }
@@ -100551,12 +100673,28 @@ var require_bingoCenters = __commonJS({
 // src/controllers/transactionController.js
 var require_transactionController = __commonJS({
   "src/controllers/transactionController.js"(exports2) {
-    var { RechargeHistory, Package } = require_models();
+    var { RechargeHistory, Package, AgentCenterAssignment } = require_models();
+    var { Op } = require_lib8();
+    async function getAgentAssignedCenterUsernames(agentUsername) {
+      const assignments = await AgentCenterAssignment.findAll({
+        where: { agent_username: agentUsername },
+        attributes: ["center_username"],
+        raw: true
+      });
+      return assignments.map((a) => a.center_username);
+    }
     exports2.list = async (req, res, next) => {
       try {
         const where2 = {};
         if (req.query.debitedBy) {
           where2.debited_by = req.query.debitedBy;
+        }
+        if (req.user.role === "AGENT") {
+          const assigned = await getAgentAssignedCenterUsernames(req.user.username);
+          if (assigned.length === 0) {
+            return res.json({ success: true, data: [] });
+          }
+          where2.bingo_center_username = { [Op.in]: assigned };
         }
         const transactions = await RechargeHistory.findAll({
           where: where2,
@@ -100604,14 +100742,31 @@ var require_transactions = __commonJS({
 var require_analyticsController = __commonJS({
   "src/controllers/analyticsController.js"(exports2) {
     var { Op } = require_lib8();
-    var { BingoCenter, RechargeHistory } = require_models();
+    var { BingoCenter, RechargeHistory, AgentCenterAssignment } = require_models();
+    async function getAgentAssignedCenterUsernames(agentUsername) {
+      const assignments = await AgentCenterAssignment.findAll({
+        where: { agent_username: agentUsername },
+        attributes: ["center_username"],
+        raw: true
+      });
+      return assignments.map((a) => a.center_username);
+    }
     exports2.getSystemAnalytics = async (req, res, next) => {
       try {
+        let centerFilter = {};
+        if (req.user.role === "AGENT") {
+          const assigned = await getAgentAssignedCenterUsernames(req.user.username);
+          if (assigned.length === 0) {
+            return res.json({ success: true, data: { totalBalance: 0, activeCenters: 0, todayGeneratedTopups: 0 } });
+          }
+          centerFilter = { bingo_center_username: { [Op.in]: assigned } };
+        }
         const [totalBalanceResult, activeCenters, todayGeneratedTopups] = await Promise.all([
-          RechargeHistory.sum("actual_amount"),
-          BingoCenter.count(),
+          RechargeHistory.sum("actual_amount", { where: centerFilter }),
+          req.user.role === "AGENT" ? AgentCenterAssignment.count({ where: { agent_username: req.user.username } }) : BingoCenter.count(),
           RechargeHistory.sum("generated_amount", {
             where: {
+              ...centerFilter,
               timestamp: {
                 [Op.gte]: new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0))
               }
@@ -162922,6 +163077,450 @@ var require_admins = __commonJS({
   }
 });
 
+// src/controllers/agentController.js
+var require_agentController = __commonJS({
+  "src/controllers/agentController.js"(exports2) {
+    var { Op } = require_lib8();
+    var bcrypt = require_bcryptjs();
+    var { User, BingoCenter, RechargeHistory, OnlineTopup, AgentCenterAssignment, Package } = require_models();
+    var { fn, col } = require_lib8();
+    var logger = require_logger2();
+    exports2.listAssignedCenters = async (req, res, next) => {
+      try {
+        const assignments = await AgentCenterAssignment.findAll({
+          where: { agent_username: req.user.username },
+          include: [{ model: BingoCenter, attributes: ["id", "full_name", "username", "mac_address", "balance", "owner_name", "phone", "address", "region", "created_at"] }],
+          order: [["created_at", "DESC"]]
+        });
+        const centerUsernames = assignments.map((a) => a.center_username);
+        const balances = {};
+        if (centerUsernames.length > 0) {
+          const results = await RechargeHistory.findAll({
+            attributes: ["bingo_center_username", [fn("COALESCE", fn("SUM", col("actual_amount")), 0), "total"]],
+            where: { bingo_center_username: centerUsernames },
+            group: ["bingo_center_username"],
+            raw: true
+          });
+          results.forEach((r) => {
+            balances[r.bingo_center_username] = parseFloat(r.total);
+          });
+        }
+        const onlineBalances = {};
+        if (centerUsernames.length > 0) {
+          const topups = await OnlineTopup.findAll({
+            where: { username: centerUsernames },
+            raw: true
+          });
+          topups.forEach((t) => {
+            onlineBalances[t.username] = {
+              balance: parseFloat(t.balance),
+              actual_balance: parseFloat(t.actual_balance),
+              paid_balance: parseFloat(t.paid_balance)
+            };
+          });
+        }
+        res.json({
+          success: true,
+          data: assignments.map((a) => ({
+            userID: a.BingoCenter.id,
+            full_name: a.BingoCenter.full_name,
+            username: a.BingoCenter.username,
+            balance: balances[a.BingoCenter.username] || 0,
+            mac_address: a.BingoCenter.mac_address,
+            createdBy: a.BingoCenter.created_by,
+            createdAt: a.BingoCenter.createdAt || a.BingoCenter.created_at,
+            owner_name: a.BingoCenter.owner_name,
+            phone: a.BingoCenter.phone,
+            address: a.BingoCenter.address,
+            region: a.BingoCenter.region,
+            onlineBalance: onlineBalances[a.BingoCenter.username]?.balance || 0,
+            onlineActualBalance: onlineBalances[a.BingoCenter.username]?.actual_balance || 0,
+            onlinePaidBalance: onlineBalances[a.BingoCenter.username]?.paid_balance || 0
+          }))
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.getCenterDetail = async (req, res, next) => {
+      try {
+        const { username } = req.params;
+        const assignment = await AgentCenterAssignment.findOne({
+          where: { agent_username: req.user.username, center_username: username }
+        });
+        if (!assignment) {
+          return res.status(404).json({ success: false, error: "Center not assigned to you" });
+        }
+        const center = await BingoCenter.findOne({ where: { username } });
+        if (!center) {
+          return res.status(404).json({ success: false, error: "Center not found" });
+        }
+        const totalRecharged = await RechargeHistory.sum("actual_amount", { where: { bingo_center_username: username } }) || 0;
+        const topup = await OnlineTopup.findOne({ where: { username } });
+        res.json({
+          success: true,
+          data: {
+            userID: center.id,
+            full_name: center.full_name,
+            username: center.username,
+            balance: totalRecharged,
+            mac_address: center.mac_address,
+            createdBy: center.created_by,
+            createdAt: center.createdAt || center.created_at,
+            owner_name: center.owner_name,
+            phone: center.phone,
+            additional_contact: center.additional_contact,
+            address: center.address,
+            region: center.region,
+            notes: center.notes,
+            onlineBalance: parseFloat(topup?.balance || 0),
+            onlineActualBalance: parseFloat(topup?.actual_balance || 0),
+            onlinePaidBalance: parseFloat(topup?.paid_balance || 0)
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.getScopedTransactions = async (req, res, next) => {
+      try {
+        const assignments = await AgentCenterAssignment.findAll({
+          where: { agent_username: req.user.username },
+          attributes: ["center_username"],
+          raw: true
+        });
+        const centerUsernames = assignments.map((a) => a.center_username);
+        if (centerUsernames.length === 0) {
+          return res.json({ success: true, data: [] });
+        }
+        const where2 = { bingo_center_username: { [Op.in]: centerUsernames } };
+        if (req.query.bingoCenterUsername) {
+          if (!centerUsernames.includes(req.query.bingoCenterUsername)) {
+            return res.json({ success: true, data: [] });
+          }
+          where2.bingo_center_username = req.query.bingoCenterUsername;
+        }
+        const transactions = await RechargeHistory.findAll({
+          where: where2,
+          include: [{ model: Package, as: "package", attributes: ["id", "name", "payment_amount", "balance_amount"] }],
+          order: [["timestamp", "DESC"]]
+        });
+        res.json({
+          success: true,
+          data: transactions.map((t) => ({
+            id: t.id,
+            actualAmount: t.actual_amount,
+            generatedAmount: t.generated_amount,
+            bingoCenterUsername: t.bingo_center_username,
+            debitedBy: t.debited_by,
+            packageId: t.package_id,
+            package: t.package ? {
+              id: t.package.id,
+              name: t.package.name,
+              paymentAmount: t.package.payment_amount,
+              balanceAmount: t.package.balance_amount
+            } : null,
+            timestamp: t.timestamp
+          }))
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.getScopedAnalytics = async (req, res, next) => {
+      try {
+        const assignments = await AgentCenterAssignment.findAll({
+          where: { agent_username: req.user.username },
+          attributes: ["center_username"],
+          raw: true
+        });
+        const centerUsernames = assignments.map((a) => a.center_username);
+        if (centerUsernames.length === 0) {
+          return res.json({ success: true, data: { totalBalance: 0, activeCenters: 0, todayGeneratedTopups: 0 } });
+        }
+        const [totalBalanceResult, activeCenters, todayGeneratedTopups] = await Promise.all([
+          RechargeHistory.sum("actual_amount", {
+            where: { bingo_center_username: { [Op.in]: centerUsernames } }
+          }),
+          AgentCenterAssignment.count({ where: { agent_username: req.user.username } }),
+          RechargeHistory.sum("generated_amount", {
+            where: {
+              bingo_center_username: { [Op.in]: centerUsernames },
+              timestamp: { [Op.gte]: new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0)) }
+            }
+          })
+        ]);
+        res.json({
+          success: true,
+          data: {
+            totalBalance: parseFloat(totalBalanceResult || "0"),
+            activeCenters,
+            todayGeneratedTopups: parseFloat(todayGeneratedTopups || "0")
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.getAssignedPackages = async (req, res, next) => {
+      try {
+        const packages = await Package.findAll({
+          where: { is_active: true },
+          attributes: ["id", "name", "payment_amount", "balance_amount", "description", "is_bonus", "usage_count"],
+          order: [["payment_amount", "ASC"]]
+        });
+        res.json({
+          success: true,
+          data: packages.map((p) => ({
+            id: p.id,
+            name: p.name,
+            paymentAmount: parseFloat(p.payment_amount),
+            balanceAmount: parseFloat(p.balance_amount),
+            description: p.description,
+            isBonus: p.is_bonus,
+            usageCount: p.usage_count
+          }))
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.listAgents = async (req, res, next) => {
+      try {
+        const agents = await User.findAll({
+          where: { role: "AGENT" },
+          attributes: ["username", "full_name", "email", "role", "profile_pic_url", "is_banned", "created_at"],
+          order: [["created_at", "DESC"]]
+        });
+        res.json({
+          success: true,
+          data: agents.map((a) => ({
+            username: a.username,
+            full_name: a.full_name,
+            email: a.email,
+            role: a.role,
+            profile_pic_url: a.profile_pic_url,
+            isBanned: a.is_banned,
+            createdAt: a.createdAt || a.created_at
+          }))
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.createAgent = async (req, res, next) => {
+      try {
+        const { username, full_name, email, password, profile_pic_url } = req.body;
+        if (!username || !full_name || !email || !password) {
+          return res.status(400).json({ success: false, error: "All required fields must be provided" });
+        }
+        const existing = await User.findOne({ where: { username } });
+        if (existing) {
+          return res.status(409).json({ success: false, error: "Username already exists" });
+        }
+        const hash = await bcrypt.hash(password, 10);
+        const agent = await User.create({
+          username,
+          full_name,
+          email,
+          password: hash,
+          role: "AGENT",
+          profile_pic_url: profile_pic_url || null,
+          is_banned: false
+        });
+        logger.info(`Agent created: ${agent.username}`);
+        res.status(201).json({
+          success: true,
+          data: {
+            username: agent.username,
+            full_name: agent.full_name,
+            email: agent.email,
+            role: agent.role,
+            profile_pic_url: agent.profile_pic_url,
+            isBanned: agent.is_banned
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.toggleBan = async (req, res, next) => {
+      try {
+        const { username } = req.params;
+        const agent = await User.findOne({ where: { username, role: "AGENT" } });
+        if (!agent) {
+          return res.status(404).json({ success: false, error: "Agent not found" });
+        }
+        agent.is_banned = !agent.is_banned;
+        await agent.save();
+        if (agent.is_banned) {
+          const { Session } = require_models();
+          await Session.update(
+            { is_valid: false },
+            { where: { user_id: agent.id, is_valid: true } }
+          );
+          logger.info(`Agent ${agent.username} banned \u2013 sessions invalidated`);
+        } else {
+          logger.info(`Agent ${agent.username} unbanned`);
+        }
+        res.json({
+          success: true,
+          data: {
+            username: agent.username,
+            full_name: agent.full_name,
+            email: agent.email,
+            role: agent.role,
+            isBanned: agent.is_banned
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.remove = async (req, res, next) => {
+      try {
+        const { username } = req.params;
+        const agent = await User.findOne({ where: { username, role: "AGENT" } });
+        if (!agent) {
+          return res.status(404).json({ success: false, error: "Agent not found" });
+        }
+        const { Session } = require_models();
+        await Session.update(
+          { is_valid: false },
+          { where: { user_id: agent.id, is_valid: true } }
+        );
+        await AgentCenterAssignment.destroy({ where: { agent_username: username } });
+        await agent.destroy();
+        logger.info(`Agent removed: ${username}`);
+        res.json({ success: true, data: true });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.resetPassword = async (req, res, next) => {
+      try {
+        const { username } = req.params;
+        const { newPassword } = req.body;
+        if (!newPassword || newPassword.length < 6) {
+          return res.status(400).json({ success: false, error: "Password must be at least 6 characters" });
+        }
+        const agent = await User.findOne({ where: { username, role: "AGENT" } });
+        if (!agent) {
+          return res.status(404).json({ success: false, error: "Agent not found" });
+        }
+        agent.password = await bcrypt.hash(newPassword, 10);
+        await agent.save();
+        logger.info(`Password reset for agent ${agent.username}`);
+        res.json({ success: true, data: true });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.assignCenter = async (req, res, next) => {
+      try {
+        const { agent_username, center_username } = req.body;
+        if (!agent_username || !center_username) {
+          return res.status(400).json({ success: false, error: "agent_username and center_username are required" });
+        }
+        const agent = await User.findOne({ where: { username: agent_username, role: "AGENT" } });
+        if (!agent) {
+          return res.status(404).json({ success: false, error: "Agent not found" });
+        }
+        const center = await BingoCenter.findOne({ where: { username: center_username } });
+        if (!center) {
+          return res.status(404).json({ success: false, error: "Center not found" });
+        }
+        const existing = await AgentCenterAssignment.findOne({
+          where: { agent_username, center_username }
+        });
+        if (existing) {
+          return res.status(409).json({ success: false, error: "Center already assigned to this agent" });
+        }
+        const assignment = await AgentCenterAssignment.create({
+          agent_username,
+          center_username,
+          assigned_by: req.user.username
+        });
+        logger.info(`Center ${center_username} assigned to agent ${agent_username} by ${req.user.username}`);
+        res.status(201).json({ success: true, data: { id: assignment.id, agent_username, center_username, assigned_by: assignment.assigned_by } });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.unassignCenter = async (req, res, next) => {
+      try {
+        const { agent_username, center_username } = req.params;
+        const assignment = await AgentCenterAssignment.findOne({
+          where: { agent_username, center_username }
+        });
+        if (!assignment) {
+          return res.status(404).json({ success: false, error: "Assignment not found" });
+        }
+        await assignment.destroy();
+        logger.info(`Center ${center_username} unassigned from agent ${agent_username}`);
+        res.json({ success: true, data: true });
+      } catch (err) {
+        next(err);
+      }
+    };
+    exports2.getAgentAssignments = async (req, res, next) => {
+      try {
+        const { username } = req.params;
+        const assignments = await AgentCenterAssignment.findAll({
+          where: { agent_username: username },
+          attributes: ["id", "agent_username", "center_username", "assigned_by", "created_at"],
+          order: [["created_at", "DESC"]]
+        });
+        res.json({ success: true, data: assignments });
+      } catch (err) {
+        next(err);
+      }
+    };
+  }
+});
+
+// src/routes/agents.js
+var require_agents = __commonJS({
+  "src/routes/agents.js"(exports2, module2) {
+    var { Router } = require_express2();
+    var { authenticate, requireRole } = require_auth();
+    var agentController = require_agentController();
+    var router = Router();
+    router.get("/", authenticate, requireRole("ADMIN"), agentController.listAgents);
+    router.post("/", authenticate, requireRole("ADMIN"), agentController.createAgent);
+    router.put("/:username/ban", authenticate, requireRole("ADMIN"), agentController.toggleBan);
+    router.put("/:username/reset-password", authenticate, requireRole("ADMIN"), agentController.resetPassword);
+    router.delete("/:username", authenticate, requireRole("ADMIN"), agentController.remove);
+    router.post("/assign-center", authenticate, requireRole("ADMIN"), agentController.assignCenter);
+    router.delete("/:agent_username/centers/:center_username", authenticate, requireRole("ADMIN"), agentController.unassignCenter);
+    router.get("/:username/assignments", authenticate, requireRole("ADMIN"), agentController.getAgentAssignments);
+    router.get("/my/centers", authenticate, requireRole("AGENT"), agentController.listAssignedCenters);
+    router.get("/my/centers/:username", authenticate, requireRole("AGENT"), agentController.getCenterDetail);
+    router.get("/my/transactions", authenticate, requireRole("AGENT"), agentController.getScopedTransactions);
+    router.get("/my/analytics", authenticate, requireRole("AGENT"), agentController.getScopedAnalytics);
+    router.get("/my/packages", authenticate, requireRole("AGENT"), agentController.getAssignedPackages);
+    module2.exports = router;
+  }
+});
+
+// src/routes/keepalive.js
+var require_keepalive = __commonJS({
+  "src/routes/keepalive.js"(exports2, module2) {
+    var express = require_express2();
+    var router = express.Router();
+    var { sequelize } = require_database();
+    router.get("/", async (req, res) => {
+      try {
+        await sequelize.authenticate();
+        res.status(200).json({ ok: true, timestamp: (/* @__PURE__ */ new Date()).toISOString() });
+      } catch (err) {
+        res.status(503).json({ ok: false, error: "db_unavailable" });
+      }
+    });
+    module2.exports = router;
+  }
+});
+
 // src/index.js
 var require_src3 = __commonJS({
   "src/index.js"(exports2, module2) {
@@ -162944,6 +163543,8 @@ var require_src3 = __commonJS({
     var passwordResetRoutes = require_passwordReset();
     var packageRoutes = require_packages();
     var adminRoutes = require_admins();
+    var agentRoutes = require_agents();
+    var keepaliveRoutes = require_keepalive();
     var app2 = express();
     app2.use(helmet());
     app2.use(compression());
@@ -162995,6 +163596,9 @@ var require_src3 = __commonJS({
     app2.use("/api/auth", passwordResetRoutes);
     app2.use("/api/packages", packageRoutes);
     app2.use("/api/admins", adminRoutes);
+    app2.use("/api/agents", agentRoutes);
+    app2.use("/api/keepalive", keepaliveRoutes);
+    app2.use("/keepalive", keepaliveRoutes);
     app2.use("*", (req, res) => {
       res.status(404).json({ error: "Route not found", path: req.originalUrl });
     });

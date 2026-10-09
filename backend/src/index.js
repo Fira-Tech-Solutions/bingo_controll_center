@@ -21,6 +21,8 @@ const uploadRoutes = require('./routes/upload');
 const passwordResetRoutes = require('./routes/passwordReset');
 const packageRoutes = require('./routes/packages');
 const adminRoutes = require('./routes/admins');
+const agentRoutes = require('./routes/agents');
+const keepaliveRoutes = require('./routes/keepalive');
 
 const app = express();
 
@@ -86,6 +88,9 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/auth', passwordResetRoutes);
 app.use('/api/packages', packageRoutes);
 app.use('/api/admins', adminRoutes);
+app.use('/api/agents', agentRoutes);
+app.use('/api/keepalive', keepaliveRoutes);
+app.use('/keepalive', keepaliveRoutes);
 
 // ── 404 handler ───────────────────────────────────────────────
 app.use('*', (req, res) => {

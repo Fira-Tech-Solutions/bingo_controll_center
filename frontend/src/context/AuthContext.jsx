@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
 
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
   const isSuperAdmin = user?.role === 'SUPER_ADMIN'
+  const isAgent = user?.role === 'AGENT'
   const canOperateCenters = user?.role === 'ADMIN' || user?.role === 'OPERATOR' || user?.role === 'SUPER_ADMIN'
 
   function persistAuth(nextToken, nextUser) {
@@ -47,7 +48,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, error, setError, login, logout, isAdmin, isSuperAdmin, canOperateCenters }}>
+    <AuthContext.Provider value={{ token, user, loading, error, setError, login, logout, isAdmin, isSuperAdmin, isAgent, canOperateCenters }}>
       {children}
     </AuthContext.Provider>
   )

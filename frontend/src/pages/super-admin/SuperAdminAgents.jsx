@@ -7,7 +7,7 @@ const inputClass = "w-full h-11 px-4 rounded-xl bg-coral-50/50 focus:bg-white ou
 
 export default function SuperAdminAgents() {
   const { token } = useAuth()
-  const [operators, setOperators] = useState([])
+  const [agents, setAgents] = useState([])
   const [centers, setCenters] = useState([])
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(false)
@@ -17,6 +17,8 @@ export default function SuperAdminAgents() {
   const [showCreate, setShowCreate] = useState(false)
   const [form, setForm] = useState({ username: '', full_name: '', email: '', password: '', confirmPassword: '' })
   const [formStep, setFormStep] = useState('form')
+  const [assignModal, setAssignModal] = useState(null)
+  const [selectedCenters, setSelectedCenters] = useState([])
 
   useEffect(() => { loadData() }, [])
 
@@ -24,12 +26,12 @@ export default function SuperAdminAgents() {
     setLoading(true)
     setError('')
     try {
-      const [opsRes, centersRes, txRes] = await Promise.all([
-        api.getOperators(token),
+      const [agentsRes, centersRes, txRes] = await Promise.all([
+        api.getAgents(token),
         api.getCenters(token),
         api.getTransactions(token),
       ])
-      setOperators(opsRes.data)
+      setAgents(agentsRes.data)
       setCenters(centersRes.data)
       setTransactions(txRes.data)
     } catch (err) {
@@ -40,14 +42,13 @@ export default function SuperAdminAgents() {
   }
 
   const agentsWithStats = useMemo(() => {
-    return operators.map((op) => {
-      const agentCenters = centers.filter((c) => c.createdBy === op.username)
-      const agentTxns = transactions.filter((t) => t.debitedBy === op.username)
+    return agents.map((a) => {
+      const agentTxns = transactions.filter((t) => t.debitedBy === a.username)
       const totalIssued = agentTxns.reduce((s, t) => s + Number(t.generatedAmount || 0), 0)
       const lastTxn = agentTxns[0]
-      return { ...op, agentCenters, agentTxns, totalIssued, lastTxn, txnCount: agentTxns.length }
+      return { ...a, agentTxns, totalIssued, lastTxn, txnCount: agentTxns.length }
     })
-  }, [operators, centers, transactions])
+  }, [agents, transactions])
 
   const filtered = useMemo(() => {
     if (!search) return agentsWithStats
@@ -72,7 +73,7 @@ export default function SuperAdminAgents() {
     setError('')
     setNotice('')
     try {
-      await api.createOperator(token, { username: form.username, full_name: form.full_name, email: form.email, password: form.password })
+      await api.createAgent(token, { username: form.username, full_name: form.full_name, email: form.email, password: form.password })
       setNotice(`Agent ${form.username} created.`)
       setForm({ username: '', full_name: '', email: '', password: '', confirmPassword: '' })
       setFormStep('form')
@@ -88,7 +89,7 @@ export default function SuperAdminAgents() {
   async function handleToggleBan(username) {
     setLoading(true)
     try {
-      await api.toggleOperatorBan(token, username)
+      await api.toggleAgentBan(token, username)
       setNotice(`Agent ${username} status updated.`)
       await loadData()
     } catch (err) { setError(err.message) } finally { setLoading(false) }
@@ -98,8 +99,28 @@ export default function SuperAdminAgents() {
     if (!window.confirm(`Delete agent ${username}? This action cannot be undone.`)) return
     setLoading(true)
     try {
-      await api.deleteOperator(token, username)
+      await api.deleteAgent(token, username)
       setNotice(`Agent ${username} deleted.`)
+      await loadData()
+    } catch (err) { setError(err.message) } finally { setLoading(false) }
+  }
+
+  function openAssignModal(agentUsername) {
+    setAssignModal(agentUsername)
+    setSelectedCenters([])
+  }
+
+  async function handleAssignCenters() {
+    if (!assignModal || selectedCenters.length === 0) return
+    setLoading(true)
+    setError('')
+    try {
+      for (const centerUsername of selectedCenters) {
+        await api.assignCenterToAgent(token, { agent_username: assignModal, center_username: centerUsername })
+      }
+      setNotice(`${selectedCenters.length} center(s) assigned to ${assignModal}.`)
+      setAssignModal(null)
+      setSelectedCenters([])
       await loadData()
     } catch (err) { setError(err.message) } finally { setLoading(false) }
   }
@@ -141,15 +162,46 @@ export default function SuperAdminAgents() {
                 <div className="flex justify-between"><span className="text-sm text-slate-500">Name</span><span className="text-sm font-bold text-slate-900">{form.full_name}</span></div>
                 <div className="flex justify-between"><span className="text-sm text-slate-500">Username</span><span className="text-sm font-bold text-slate-900 font-mono">{form.username}</span></div>
                 <div className="flex justify-between"><span className="text-sm text-slate-500">Email</span><span className="text-sm font-bold text-slate-900">{form.email}</span></div>
-                <div className="flex justify-between"><span className="text-sm text-slate-500">Role</span><span className="text-sm font-bold text-coral-600">OPERATOR (Agent)</span></div>
+                <div className="flex justify-between"><span className="text-sm text-slate-500">Role</span><span className="text-sm font-bold text-coral-600">AGENT</span></div>
               </div>
               <div className="flex gap-3 mt-4">
-                <button onClick={handleCreate} disabled={loading} className="px-6 py-2.5 rounded-xl bg-coral-500 text-white font-bold text-sm shadow-md shadow-coral-500/20 hover:bg-coral-600 transition-colors disabled:opacity-60">{loading ? <i className="fa-solid fa-spinner fa-spin"></i> : 'Create Agent'}</button>
+                <button onClick={handleCreate} disabled={loading} className="px-6 py-2.5 rounded-xl bg-coral-500 text-white font-bold text-sm shadow-md shadow-coral-500/20 hover:bg-coral-600 transition-colors disabled:opacity-60">{loading ? 'Creating...' : 'Create Agent'}</button>
                 <button onClick={() => setFormStep('form')} className="px-6 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-semibold text-sm hover:bg-slate-200 transition-colors">Back</button>
               </div>
             </>
           )}
         </section>
+      )}
+
+      {/* Assign Centers Modal */}
+      {assignModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setAssignModal(null)} />
+          <div className="relative w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-3xl shadow-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h3 className="font-extrabold text-lg text-slate-900">Assign Centers to {assignModal}</h3>
+            </div>
+            <div className="flex-1 overflow-auto px-5 py-4 space-y-2">
+              {centers.map((c) => (
+                <label key={c.username} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${selectedCenters.includes(c.username) ? 'bg-coral-50 border-coral-200' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
+                  <input type="checkbox" checked={selectedCenters.includes(c.username)} onChange={(e) => {
+                    if (e.target.checked) setSelectedCenters((s) => [...s, c.username])
+                    else setSelectedCenters((s) => s.filter((u) => u !== c.username))
+                  }} className="w-4 h-4 rounded border-slate-300 text-coral-500 focus:ring-coral-500" />
+                  <div className="min-w-0">
+                    <div className="font-semibold text-sm text-slate-900">{c.full_name}</div>
+                    <div className="text-xs text-slate-500 font-mono">{c.username}</div>
+                  </div>
+                </label>
+              ))}
+              {centers.length === 0 && <div className="text-center py-8 text-sm text-slate-400">No centers available</div>}
+            </div>
+            <div className="px-5 py-4 border-t border-slate-100 flex gap-3">
+              <button onClick={handleAssignCenters} disabled={loading || selectedCenters.length === 0} className="flex-1 py-3 rounded-2xl bg-coral-500 text-white font-bold text-sm shadow-lg shadow-coral-500/25 hover:bg-coral-600 active:scale-[0.97] transition-all disabled:opacity-40">Assign {selectedCenters.length} Center(s)</button>
+              <button onClick={() => setAssignModal(null)} className="px-5 py-3 rounded-2xl text-slate-400 font-semibold text-sm hover:text-slate-600 transition-colors">Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Desktop Table */}
@@ -159,7 +211,6 @@ export default function SuperAdminAgents() {
             <tr className="border-b border-coral-100">
               <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Agent</th>
               <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-              <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">Centers</th>
               <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">Transactions</th>
               <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">Balance Issued</th>
               <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">Last Activity</th>
@@ -181,12 +232,12 @@ export default function SuperAdminAgents() {
                 <td className="px-6 py-4">
                   <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${a.isBanned ? 'bg-red-100 text-red-700 border-red-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200'}`}>{a.isBanned ? 'Banned' : 'Active'}</span>
                 </td>
-                <td className="px-6 py-4 text-right text-sm font-semibold text-slate-900">{a.agentCenters.length}</td>
                 <td className="px-6 py-4 text-right text-sm text-slate-700">{a.txnCount}</td>
                 <td className="px-6 py-4 text-right text-sm font-bold text-slate-900">{formatAmount(a.totalIssued)}</td>
                 <td className="px-6 py-4 text-right text-xs text-slate-500">{a.lastTxn ? formatDate(a.lastTxn.timestamp) : '—'}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
+                    <button onClick={() => openAssignModal(a.username)} className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-xs font-semibold border border-blue-200 hover:bg-blue-100 transition-colors">Assign</button>
                     <button onClick={() => handleToggleBan(a.username)} disabled={loading} className="px-3 py-1.5 rounded-lg bg-coral-50 text-coral-600 text-xs font-semibold border border-coral-100 hover:bg-coral-100 transition-colors">{a.isBanned ? 'Unban' : 'Ban'}</button>
                     <button onClick={() => handleDelete(a.username)} disabled={loading} className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-semibold border border-red-200 hover:bg-red-100 transition-colors">Delete</button>
                   </div>
@@ -214,10 +265,6 @@ export default function SuperAdminAgents() {
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3 text-center">
               <div className="p-2 rounded-lg bg-coral-50/50">
-                <div className="text-xs text-slate-500">Centers</div>
-                <div className="font-bold text-sm text-slate-900">{a.agentCenters.length}</div>
-              </div>
-              <div className="p-2 rounded-lg bg-coral-50/50">
                 <div className="text-xs text-slate-500">Transactions</div>
                 <div className="font-bold text-sm text-slate-900">{a.txnCount}</div>
               </div>
@@ -225,10 +272,14 @@ export default function SuperAdminAgents() {
                 <div className="text-xs text-slate-500">Issued</div>
                 <div className="font-bold text-sm text-slate-900">{formatAmount(a.totalIssued)}</div>
               </div>
+              <div className="p-2 rounded-lg bg-coral-50/50">
+                <div className="text-xs text-slate-500">Status</div>
+                <div className="font-bold text-sm text-slate-900">{a.isBanned ? 'Banned' : 'Active'}</div>
+              </div>
             </div>
             <div className="flex gap-2 mt-3">
+              <button onClick={() => openAssignModal(a.username)} className="flex-1 py-2 rounded-lg bg-blue-50 text-blue-600 text-xs font-semibold border border-blue-200">Assign Centers</button>
               <button onClick={() => handleToggleBan(a.username)} disabled={loading} className="flex-1 py-2 rounded-lg bg-coral-50 text-coral-600 text-xs font-semibold border border-coral-100">{a.isBanned ? 'Unban' : 'Ban'}</button>
-              <button onClick={() => handleDelete(a.username)} disabled={loading} className="flex-1 py-2 rounded-lg bg-red-50 text-red-600 text-xs font-semibold border border-red-200">Delete</button>
             </div>
           </div>
         ))}

@@ -1,4 +1,14 @@
-const { RechargeHistory, Package } = require('../models');
+const { RechargeHistory, Package, AgentCenterAssignment } = require('../models');
+const { Op } = require('sequelize');
+
+async function getAgentAssignedCenterUsernames(agentUsername) {
+  const assignments = await AgentCenterAssignment.findAll({
+    where: { agent_username: agentUsername },
+    attributes: ['center_username'],
+    raw: true,
+  });
+  return assignments.map(a => a.center_username);
+}
 
 exports.list = async (req, res, next) => {
   try {
@@ -6,6 +16,16 @@ exports.list = async (req, res, next) => {
     if (req.query.debitedBy) {
       where.debited_by = req.query.debitedBy;
     }
+
+    // Scope: agents only see transactions for their assigned centers
+    if (req.user.role === 'AGENT') {
+      const assigned = await getAgentAssignedCenterUsernames(req.user.username);
+      if (assigned.length === 0) {
+        return res.json({ success: true, data: [] });
+      }
+      where.bingo_center_username = { [Op.in]: assigned };
+    }
+
     const transactions = await RechargeHistory.findAll({
       where,
       include: [{ model: Package, as: 'package', attributes: ['id', 'name', 'payment_amount', 'balance_amount'] }],

@@ -83,3 +83,53 @@ export function useProfile(token) {
     gcTime: 10 * 60 * 1000,
   })
 }
+
+export function useAgents(token) {
+  return useQuery({
+    queryKey: ['agents'],
+    queryFn: () => api.getAgents(token).then((r) => r.data),
+    enabled: !!token,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  })
+}
+
+export function useMyCenters(token) {
+  return useQuery({
+    queryKey: ['my-centers'],
+    queryFn: () => api.getMyCenters(token).then((r) => r.data),
+    enabled: !!token,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  })
+}
+
+export function useMyTransactions(token) {
+  return useQuery({
+    queryKey: ['my-transactions'],
+    queryFn: () => api.getMyTransactions(token).then((r) => r.data),
+    enabled: !!token,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  })
+}
+
+export function useMyAnalytics(token) {
+  return useQuery({
+    queryKey: ['my-analytics'],
+    queryFn: () => api.getMyAnalytics(token),
+    enabled: !!token,
+    staleTime: 60 * 1000,
+    gcTime: GC_TIME,
+  })
+}
+
+export function useMyPackages(token) {
+  return useQuery({
+    queryKey: ['my-packages'],
+    queryFn: () => api.getMyPackages(token).then((r) => r.data),
+    enabled: !!token,
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  })
+}

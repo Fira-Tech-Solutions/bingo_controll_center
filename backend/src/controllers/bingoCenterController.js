@@ -1,9 +1,18 @@
 const bcrypt = require('bcryptjs');
-const { BingoCenter, RechargeHistory, OnlineTopup, Package } = require('../models');
+const { BingoCenter, RechargeHistory, OnlineTopup, Package, AgentCenterAssignment } = require('../models');
 const { generateUserFile, generateTopupFile } = require('../services/cryptoService');
-const { fn, col } = require('sequelize');
+const { fn, col, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 const logger = require('../utils/logger');
+
+async function getAgentAssignedCenterUsernames(agentUsername) {
+  const assignments = await AgentCenterAssignment.findAll({
+    where: { agent_username: agentUsername },
+    attributes: ['center_username'],
+    raw: true,
+  });
+  return assignments.map(a => a.center_username);
+}
 
 exports.list = async (req, res, next) => {
   try {
@@ -11,6 +20,16 @@ exports.list = async (req, res, next) => {
     if (req.query.createdBy) {
       where.created_by = req.query.createdBy;
     }
+
+    // Scope: agents only see assigned centers
+    if (req.user.role === 'AGENT') {
+      const assigned = await getAgentAssignedCenterUsernames(req.user.username);
+      if (assigned.length === 0) {
+        return res.json({ success: true, data: [] });
+      }
+      where.username = { [Op.in]: assigned };
+    }
+
     const centers = await BingoCenter.findAll({ where, order: [['created_at', 'DESC']] });
 
     const centerUsernames = centers.map(c => c.username);
@@ -137,6 +156,16 @@ exports.create = async (req, res, next) => {
 
     logger.info(`Bingo center created: ${result.center.username} with initial balance ${balance}`);
 
+    // Auto-assign center to the creating agent
+    if (req.user.role === 'AGENT') {
+      await AgentCenterAssignment.create({
+        agent_username: req.user.username,
+        center_username: username,
+        assigned_by: req.user.username,
+      });
+      logger.info(`Center ${username} auto-assigned to agent ${req.user.username}`);
+    }
+
     // Generate the encrypted terminal file for PHP backend import
     const encFile = generateUserFile(
       result.center.username,
@@ -217,6 +246,16 @@ exports.recharge = async (req, res, next) => {
       return res.status(404).json({ success: false, error: 'Transaction Failed: Bingo Center not found' });
     }
 
+    // Agent scope check: agents can only recharge assigned centers
+    if (req.user.role === 'AGENT') {
+      const assignment = await AgentCenterAssignment.findOne({
+        where: { agent_username: req.user.username, center_username: bingoCenterUsername },
+      });
+      if (!assignment) {
+        return res.status(403).json({ success: false, error: 'Center not assigned to you' });
+      }
+    }
+
     // Atomic balance update — track actual paid amount
     const newBalance = parseFloat(center.balance) + actVal;
     await center.update({ balance: newBalance });
@@ -278,6 +317,16 @@ exports.regenerateUserFile = async (req, res, next) => {
     const center = await BingoCenter.findOne({ where: { username } });
     if (!center) {
       return res.status(404).json({ success: false, error: 'Bingo center not found' });
+    }
+
+    // Agent scope check: agents can only regenerate files for assigned centers
+    if (req.user.role === 'AGENT') {
+      const assignment = await AgentCenterAssignment.findOne({
+        where: { agent_username: req.user.username, center_username: username },
+      });
+      if (!assignment) {
+        return res.status(403).json({ success: false, error: 'Center not assigned to you' });
+      }
     }
 
     const encFile = generateUserFile(

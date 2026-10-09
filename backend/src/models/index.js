@@ -5,6 +5,7 @@ const Session = require('./Session');
 const PasswordResetToken = require('./PasswordResetToken');
 const OnlineTopup = require('./OnlineTopup');
 const Package = require('./Package');
+const AgentCenterAssignment = require('./AgentCenterAssignment');
 
 // ── Associations ──────────────────────────────────────────────
 
@@ -27,6 +28,10 @@ OnlineTopup.belongsTo(BingoCenter, { foreignKey: 'username', targetKey: 'usernam
 RechargeHistory.belongsTo(Package, { foreignKey: 'package_id', as: 'package' });
 Package.hasMany(RechargeHistory, { foreignKey: 'package_id' });
 
+// Agent-Center assignments
+AgentCenterAssignment.belongsTo(BingoCenter, { foreignKey: 'center_username', targetKey: 'username' });
+BingoCenter.hasMany(AgentCenterAssignment, { foreignKey: 'center_username', sourceKey: 'username' });
+
 module.exports = {
   User,
   BingoCenter,
@@ -35,4 +40,5 @@ module.exports = {
   PasswordResetToken,
   OnlineTopup,
   Package,
+  AgentCenterAssignment,
 };

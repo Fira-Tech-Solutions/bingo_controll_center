@@ -24,12 +24,12 @@ export default function AdminAgents() {
     setLoading(true)
     setError('')
     try {
-      const [o, c, t] = await Promise.all([
-        api.getOperators(token),
+      const [a, c, t] = await Promise.all([
+        api.getAgents(token),
         api.getCenters(token),
         api.getTransactions(token, user?.username),
       ])
-      setOperators(o.data)
+      setOperators(a.data)
       setCenters(c.data)
       setTransactions(t.data)
     } catch (err) { setError(err.message) } finally { setLoading(false) }
@@ -65,7 +65,7 @@ export default function AdminAgents() {
     setError('')
     setNotice('')
     try {
-      await api.createOperator(token, { username: form.username, full_name: form.full_name, email: form.email, password: form.password })
+      await api.createAgent(token, { username: form.username, full_name: form.full_name, email: form.email, password: form.password })
       setNotice(`Agent ${form.username} created.`)
       setForm({ username: '', full_name: '', email: '', password: '', confirmPassword: '' })
       setFormStep('form')
@@ -77,7 +77,7 @@ export default function AdminAgents() {
   async function handleToggleBan(username) {
     setLoading(true)
     try {
-      await api.toggleOperatorBan(token, username)
+      await api.toggleAgentBan(token, username)
       setNotice(`Agent ${username} status updated.`)
       await loadData()
     } catch (err) { setError(err.message) } finally { setLoading(false) }
@@ -87,7 +87,7 @@ export default function AdminAgents() {
     if (!window.confirm(`Delete agent ${username}? This action cannot be undone.`)) return
     setLoading(true)
     try {
-      await api.deleteOperator(token, username)
+      await api.deleteAgent(token, username)
       setNotice(`Agent ${username} deleted.`)
       await loadData()
     } catch (err) { setError(err.message) } finally { setLoading(false) }
@@ -130,7 +130,7 @@ export default function AdminAgents() {
                 <div className="flex justify-between"><span className="text-sm text-slate-500">Name</span><span className="text-sm font-bold text-slate-900">{form.full_name}</span></div>
                 <div className="flex justify-between"><span className="text-sm text-slate-500">Username</span><span className="text-sm font-bold text-slate-900 font-mono">{form.username}</span></div>
                 <div className="flex justify-between"><span className="text-sm text-slate-500">Email</span><span className="text-sm font-bold text-slate-900">{form.email}</span></div>
-                <div className="flex justify-between"><span className="text-sm text-slate-500">Role</span><span className="text-sm font-bold text-coral-600">OPERATOR (Agent)</span></div>
+                <div className="flex justify-between"><span className="text-sm text-slate-500">Role</span><span className="text-sm font-bold text-coral-600">AGENT</span></div>
               </div>
               <div className="flex gap-3 mt-4">
                 <button onClick={handleCreate} disabled={loading} className="px-6 py-2.5 rounded-xl bg-coral-500 text-white font-bold text-sm shadow-md shadow-coral-500/20 hover:bg-coral-600 transition-colors disabled:opacity-60">{loading ? <i className="fa-solid fa-spinner fa-spin"></i> : 'Create Agent'}</button>
